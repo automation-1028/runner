@@ -1,9 +1,74 @@
-import z from 'zod';
+import fs from 'fs';
+import path from 'path';
+import bluebird from 'bluebird';
+import {
+  generateVideo,
+  DEFAULT_VIDEO_INFO,
+  VideoRequestPayload,
+  getTask,
+} from './services/video-generator';
+import { generateScript } from './services/script-generator';
 
-const isString = z.string();
+async function main() {
+  const keywords = [
+    'time management',
+    'how i plan my week for maximum productivity',
+    'productivity tips cat code',
+    'happy planner plan with me',
+    'happy planner winter release',
+    'happy planner flip through',
+  ];
 
-function main() {
-  console.log(isString.parse('Hello TypeScript!'));
+  const videoScripts = await bluebird.Promise.map(keywords, generateScript, {
+    concurrency: 1,
+  });
+
+  for (const videoScript of videoScripts) {
+    const videos = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../videos.json'), 'utf-8'),
+    );
+
+    const videoTaskRes = await generateVideo({
+      ...{
+        video_subject: videoScript.title,
+        video_description: videoScript.description,
+        video_terms: videoScript.tags,
+        thumbnail: videoScript.thumbnail,
+        video_script: videoScript.script,
+      },
+      ...DEFAULT_VIDEO_INFO,
+    } as VideoRequestPayload);
+
+    let taskRes;
+    let isFinished = false;
+    do {
+      taskRes = await getTask(videoTaskRes.task_id);
+      const { progress } = taskRes;
+
+      console.log({ progress });
+      isFinished = progress === 100;
+      if (!isFinished) {
+        await new Promise((resolve) => setTimeout(resolve, 10_000));
+      }
+    } while (!isFinished);
+
+    const newVideos = [
+      ...videos,
+      {
+        ...{
+          title: videoScript.title,
+          description: videoScript.description,
+          thumbnail: videoScript.thumbnail,
+          tags: videoScript.tags,
+        },
+        ...videoTaskRes,
+      },
+    ];
+
+    fs.writeFileSync('videos.json', JSON.stringify(newVideos, null, 2));
+  }
+
+  console.log('All videos have been generated!');
 }
 
 main();
