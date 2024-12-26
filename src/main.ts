@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import bluebird from 'bluebird';
 import {
   generateVideo,
   DEFAULT_VIDEO_INFO,
@@ -19,14 +18,8 @@ async function main() {
     'happy planner flip through',
   ];
 
-  const videoScripts = await bluebird.Promise.map(keywords, generateScript, {
-    concurrency: 1,
-  });
-
-  for (const videoScript of videoScripts) {
-    const videos = JSON.parse(
-      fs.readFileSync(path.join(__dirname, '../videos.json'), 'utf-8'),
-    );
+  for (const keyword of keywords) {
+    const videoScript = await generateScript(keyword);
 
     const videoTaskRes = await generateVideo({
       ...{
@@ -51,6 +44,10 @@ async function main() {
         await new Promise((resolve) => setTimeout(resolve, 10_000));
       }
     } while (!isFinished);
+
+    const videos = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '../videos.json'), 'utf-8'),
+    );
 
     const newVideos = [
       ...videos,
