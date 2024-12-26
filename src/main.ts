@@ -57,6 +57,7 @@ async function main() {
           description: videoScript.description,
           thumbnail: videoScript.thumbnail,
           tags: videoScript.tags,
+          script: videoScript.script,
         },
         ...videoTaskRes,
       },
