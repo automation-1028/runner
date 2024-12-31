@@ -96,12 +96,12 @@ async function main() {
     }
   };
 
-  for (const keyword of keywords) {
-    await genVideoFromKeyword(keyword);
-  }
-  // await Bluebird.Promise.map(keywords, async (keyword) => {}, {
-  //   concurrency: 1,
-  // });
+  await Bluebird.Promise.map(keywords, genVideoFromKeyword, {
+    concurrency: 2,
+  });
+  // for (const keyword of keywords) {
+  //   await genVideoFromKeyword(keyword);
+  // }
 
   console.log('All videos have been generated!');
 }
