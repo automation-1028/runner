@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import moment from 'moment-timezone';
+import 'dotenv/config';
 
 import {
   generateVideo,
@@ -215,7 +216,7 @@ async function autoUpload() {
       description,
       thumbnail,
       tags,
-      filePath: `/Users/thanhtuan/ind/video-generator/storage/tasks/${task_id}/final-1.mp4`,
+      filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
       publishAt: moment()
         .tz('America/New_York')
         .add(1, 'days')
