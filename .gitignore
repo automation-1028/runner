@@ -131,3 +131,8 @@ dist
 
 # database
 .database
+
+
+videos.json
+short-videos.json
+keywords.txt

@@ -23,33 +23,10 @@ interface VideoScript {
   task_id: string;
 }
 
-// main();
+main();
 async function main() {
-  const keywords = `
-how to save a life
-how to change your life
-how to get no life rod in fisch
-what game theory reveals about life
-when will my life begin
-how to unfuck your life
-how to save a life the fray
-how to get no life rod
-how to be successful in life
-do you believe in life after love
-what is life
-how to stop wasting your life
-how to organize your life
-how to make the greatest comeback of your life
-how to fix your life
-what is the meaning of life
-how to get the no life rod in fisch
-how to ruin your college life
-what a life
-how to gamify your life
-how to find purpose and passion in life
-how to figure out what you want to do with your life
-how to get your life together
-how to ruin your life`
+  const keywords = fs
+    .readFileSync(path.join(__dirname, '../keywords.txt'), 'utf-8')
     .trim()
     .split('\n');
 
@@ -87,6 +64,11 @@ how to ruin your life`
         const videos = JSON.parse(
           fs.readFileSync(path.join(__dirname, '../videos.json'), 'utf-8'),
         );
+        const keywords = fs
+          .readFileSync(path.join(__dirname, '../keywords.txt'), 'utf-8')
+          .trim()
+          .split('\n');
+        const newKeywords = keywords.filter((k) => k !== keyword);
 
         const newVideos = [
           ...videos,
@@ -102,6 +84,7 @@ how to ruin your life`
           },
         ];
 
+        fs.writeFileSync('keywords.txt', newKeywords.join('\n'));
         fs.writeFileSync('videos.json', JSON.stringify(newVideos, null, 2));
       });
     } catch (error) {
@@ -123,7 +106,7 @@ how to ruin your life`
   console.log('All videos have been generated!');
 }
 
-convertLongtoShort();
+// convertLongtoShort();
 async function convertLongtoShort() {
   const videoScripts = JSON.parse(
     fs.readFileSync(path.join(__dirname, '../videos.json'), 'utf-8'),
