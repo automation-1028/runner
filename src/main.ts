@@ -97,7 +97,7 @@ async function main() {
   };
 
   await Bluebird.Promise.map(keywords, genVideoFromKeyword, {
-    concurrency: 1,
+    concurrency: 5,
   });
   // for (const keyword of keywords) {
   //   await genVideoFromKeyword(keyword);
