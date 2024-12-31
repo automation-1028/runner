@@ -26,33 +26,30 @@ interface VideoScript {
 // main();
 async function main() {
   const keywords = `
-what we do in life echoes in eternity
-how to glitch deva in shindo life
-what does e y e s spell gacha life meme
-how to make the greatest comeback of your life
-how to gamify your life
-how to download gacha life in laptop
-how to change your life in 90 days
-how to be lucky in shindo life
-how to save battery life laptop
-why self improvement is ruining your life
-how to document your life
-how to get tailed beast in shindo life
-how to complete mission black mesa inbound half life 2
-how to level up in life
-how to change your life in 2025
-how did you die in your past life meme fnaf
-how to get all achievment in life is a game
-why reaction thug life
+how to save a life
+how to change your life
+how to get no life rod in fisch
+what game theory reveals about life
+when will my life begin
+how to unfuck your life
+how to save a life the fray
+how to get no life rod
+how to be successful in life
+do you believe in life after love
+what is life
 how to stop wasting your life
-how to extend battery life on a laptop
 how to organize your life
-how to remember everything for the rest of your life
-when the girls are drunk gacha life
-how to get good players in war shindo life
-how to download life is strange 2 on pc
-why study abroad changed my life
-how to change your life`
+how to make the greatest comeback of your life
+how to fix your life
+what is the meaning of life
+how to get the no life rod in fisch
+how to ruin your college life
+what a life
+how to gamify your life
+how to find purpose and passion in life
+how to figure out what you want to do with your life
+how to get your life together
+how to ruin your life`
     .trim()
     .split('\n');
 
