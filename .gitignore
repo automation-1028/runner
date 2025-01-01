@@ -132,7 +132,7 @@ dist
 # database
 .database
 
-
+scripts.json
 videos.json
 short-videos.json
 keywords.txt
