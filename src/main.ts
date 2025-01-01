@@ -116,6 +116,19 @@ async function convertLongtoShort() {
     videoScripts,
     async (videoScript: VideoScript) => {
       await retry(async () => {
+        // check if video already exists
+        const shortVideos = JSON.parse(
+          fs.readFileSync(
+            path.join(__dirname, '../short-videos.json'),
+            'utf-8',
+          ),
+        );
+        if (
+          shortVideos.find((v: VideoScript) => v.title === videoScript.title)
+        ) {
+          return;
+        }
+
         const videoTaskRes = await generateVideo({
           ...DEFAULT_VIDEO_INFO,
           ...{
