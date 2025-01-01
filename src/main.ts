@@ -209,10 +209,7 @@ async function autoUpload() {
       description,
       thumbnail,
       tags,
-      filePath: path.join(
-        process.env.VIDEO_TASK_DIR as string,
-        `\\${task_id}\\final-1.mp4`,
-      ),
+      filePath: `${process.env.VIDEO_TASK_DIR}\\${task_id}\\final-1.mp4`,
       publishAt: moment()
         .tz('America/New_York')
         .add(1, 'days')
