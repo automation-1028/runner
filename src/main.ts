@@ -41,7 +41,7 @@ function getScripts(): Script[] {
   return scripts;
 }
 
-generateScripts();
+// generateScripts();
 generateVideos();
 generateShortVideos();
 async function generateScripts() {
@@ -120,6 +120,11 @@ async function generateVideos() {
           `[generateVideos] Generating video with ${script.keyword} keyword...`,
         );
         await retry(async () => {
+          // check if video already exists
+          if (script.isLongGenerated) {
+            return;
+          }
+
           const videoTaskRes = await generateVideo({
             ...{
               video_subject: script.title,
@@ -187,7 +192,7 @@ async function generateVideos() {
     };
 
     await Bluebird.Promise.map(scripts, genVideo, {
-      concurrency: 3,
+      concurrency: 2,
     });
 
     console.log('All videos have been generated!');
@@ -204,13 +209,7 @@ async function generateShortVideos() {
       async (script: Script) => {
         await retry(async () => {
           // check if video already exists
-          const shortVideos = JSON.parse(
-            fs.readFileSync(
-              path.join(__dirname, '../short-videos.json'),
-              'utf-8',
-            ),
-          );
-          if (shortVideos.find((v: VideoScript) => v.title === script.title)) {
+          if (script.isShortGenerated) {
             return;
           }
 
@@ -282,7 +281,7 @@ async function generateShortVideos() {
         });
       },
       {
-        concurrency: 5,
+        concurrency: 2,
       },
     );
 
