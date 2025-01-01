@@ -6,7 +6,7 @@ const instance = axios.create({
 
 export interface VideoRequestPayload {
   video_subject: string;
-  video_script: string;
+  video_script?: string;
   video_terms: string;
   video_aspect: string;
   video_concat_mode: string;

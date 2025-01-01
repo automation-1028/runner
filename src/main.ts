@@ -20,7 +20,6 @@ interface ScriptBase {
   description: string;
   thumbnail: string;
   tags: string;
-  script: string;
 }
 
 interface VideoScript extends ScriptBase {
@@ -41,7 +40,7 @@ function getScripts(): Script[] {
   return scripts;
 }
 
-// generateScripts();
+generateScripts();
 generateVideos();
 generateShortVideos();
 async function generateScripts() {
@@ -126,14 +125,14 @@ async function generateVideos() {
           }
 
           const videoTaskRes = await generateVideo({
+            ...DEFAULT_VIDEO_INFO,
             ...{
               video_subject: script.title,
               video_description: script.description,
               video_terms: script.tags,
               thumbnail: script.thumbnail,
-              video_script: script.script,
+              paragraph_number: 25,
             },
-            ...DEFAULT_VIDEO_INFO,
           } as VideoRequestPayload);
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -162,7 +161,6 @@ async function generateVideos() {
                 description: script.description,
                 thumbnail: script.thumbnail,
                 tags: script.tags,
-                script: script.script,
               },
               ...videoTaskRes,
             },
@@ -256,7 +254,6 @@ async function generateShortVideos() {
                 description: script.description,
                 thumbnail: script.thumbnail,
                 tags: script.tags,
-                script: script.script,
               },
               ...videoTaskRes,
             },
