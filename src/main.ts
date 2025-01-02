@@ -306,7 +306,7 @@ async function autoUpload() {
       tags: tags // limit 20 tags
         .split(',')
         .map((s) => s.trim())
-        .slice(0, 20)
+        .slice(0, 15)
         .join(', '),
       filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
       publishAt: moment()
