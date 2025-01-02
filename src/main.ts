@@ -131,7 +131,7 @@ async function generateVideos() {
               video_description: script.description,
               video_terms: script.tags,
               thumbnail: script.thumbnail,
-              paragraph_number: 25,
+              paragraph_number: 50,
             },
           } as VideoRequestPayload);
 
