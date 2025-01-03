@@ -98,6 +98,8 @@ async function generateScripts() {
             (error as Error).message
           }`,
         );
+      } finally {
+        await sleep(60_000);
       }
     };
 
