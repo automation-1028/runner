@@ -48,8 +48,9 @@ async function generateScripts() {
   const getKeywords = () => {
     const keywords = fs
       .readFileSync(path.join(__dirname, '../keywords.txt'), 'utf-8')
-      .trim()
-      .split('\n');
+      .split('\n')
+      .map((k) => k.trim())
+      .filter((k) => !!k);
 
     return keywords;
   };
