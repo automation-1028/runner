@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment-timezone';
 import 'dotenv/config';
+import _ from 'lodash';
 
 import {
   generateVideo,
@@ -292,9 +293,10 @@ async function autoUpload() {
   const videoPath = path.join(__dirname, '../short-videos.json');
   // const videoPath = path.join(__dirname, '../videos.json');
 
-  const videoScripts: VideoScript[] = JSON.parse(
+  let videoScripts: VideoScript[] = JSON.parse(
     fs.readFileSync(videoPath, 'utf-8'),
   );
+  videoScripts = _.sampleSize(videoScripts, 15);
 
   for (const videoScript of videoScripts) {
     const { title, description, thumbnail, tags, task_id } = videoScript;
