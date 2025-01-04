@@ -299,7 +299,7 @@ async function autoUpload() {
   let videoScripts: VideoScript[] = JSON.parse(
     fs.readFileSync(videoPath, 'utf-8'),
   );
-  videoScripts = _.sampleSize(videoScripts, 15);
+  videoScripts = _.sampleSize(videoScripts, 25);
   const isShort = videoPath.includes('short');
 
   for (const videoScript of videoScripts) {
