@@ -300,6 +300,7 @@ async function autoUpload() {
     fs.readFileSync(videoPath, 'utf-8'),
   );
   videoScripts = _.sampleSize(videoScripts, 15);
+  const isShort = videoPath.includes('short');
 
   for (const videoScript of videoScripts) {
     const { title, description, thumbnail, tags, task_id } = videoScript;
@@ -307,7 +308,7 @@ async function autoUpload() {
     await uploadVideo({
       title,
       description,
-      thumbnail,
+      thumbnail: isShort ? '' : thumbnail,
       tags: tags // limit 20 tags
         .split(',')
         .map((s) => s.trim())
