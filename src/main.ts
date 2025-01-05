@@ -25,6 +25,8 @@ interface ScriptBase {
 
 interface VideoScript extends ScriptBase {
   task_id: string;
+  isShort?: boolean;
+  isLong?: boolean;
 }
 
 interface Script extends ScriptBase {
@@ -44,6 +46,7 @@ function getScripts(): Script[] {
 generateScripts();
 generateVideos();
 generateShortVideos();
+autoUpload();
 async function generateScripts() {
   const getKeywords = () => {
     const keywords = fs
@@ -291,44 +294,67 @@ async function generateShortVideos() {
   }
 }
 
-// autoUpload();
 async function autoUpload() {
-  const videoPath = path.join(__dirname, '../short-videos.json');
-  // const videoPath = path.join(__dirname, '../videos.json');
+  const shortVideoPath = path.join(__dirname, '../short-videos.json');
+  const longVideoPath = path.join(__dirname, '../videos.json');
 
-  let videoScripts: VideoScript[] = JSON.parse(
-    fs.readFileSync(videoPath, 'utf-8'),
+  let shortVideoScripts: VideoScript[] = JSON.parse(
+    fs.readFileSync(shortVideoPath, 'utf-8'),
   );
-  videoScripts = _.sampleSize(videoScripts, 25);
-  const isShort = videoPath.includes('short');
+  shortVideoScripts = shortVideoScripts.map((s) => ({ ...s, isShort: true }));
+
+  let longVideoScripts: VideoScript[] = JSON.parse(
+    fs.readFileSync(longVideoPath, 'utf-8'),
+  );
+  longVideoScripts = longVideoScripts.map((s) => ({ ...s, isLong: true }));
+
+  let videoScripts = [...shortVideoScripts, ...longVideoScripts];
+  videoScripts = _.sampleSize(videoScripts, videoScripts.length);
 
   for (const videoScript of videoScripts) {
-    const { title, description, thumbnail, tags, task_id } = videoScript;
+    const { title, description, thumbnail, tags, task_id, isShort } =
+      videoScript;
 
-    await uploadVideo({
-      title,
-      description,
-      thumbnail: isShort ? '' : thumbnail,
-      tags: tags // limit 20 tags
-        .split(',')
-        .map((s) => s.trim())
-        .slice(0, 15)
-        .join(', '),
-      filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
-      publishAt: moment()
-        .tz('America/New_York')
-        .add(1, 'days')
-        .hour(10 + Math.floor(Math.random() * 14))
-        .minute(Math.floor(Math.random() * 60))
-        .toDate(),
-    }).then(console.log);
+    console.log(`Uploading video: ${title}...`);
+    try {
+      await uploadVideo({
+        title,
+        description,
+        thumbnail: isShort ? '' : thumbnail,
+        tags: tags // limit 20 tags
+          .split(',')
+          .map((s) => s.trim())
+          .slice(0, 15)
+          .join(', '),
+        filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
+        publishAt: moment()
+          .tz('America/New_York')
+          .add(1, 'days')
+          .hour(10 + Math.floor(Math.random() * 14))
+          .minute(Math.floor(Math.random() * 60))
+          .toDate(),
+      }).then(console.log);
 
-    const oldVideoScripts = JSON.parse(fs.readFileSync(videoPath, 'utf-8'));
+      const oldVideoScripts = JSON.parse(
+        fs.readFileSync(isShort ? shortVideoPath : longVideoPath, 'utf-8'),
+      );
 
-    const newVideoScripts = oldVideoScripts.filter(
-      (video: VideoScript) => video.task_id !== task_id,
-    );
-    fs.writeFileSync(videoPath, JSON.stringify(newVideoScripts, null, 2));
+      const newVideoScripts = oldVideoScripts.filter(
+        (video: VideoScript) => video.task_id !== task_id,
+      );
+      fs.writeFileSync(
+        isShort ? shortVideoPath : longVideoPath,
+        JSON.stringify(newVideoScripts, null, 2),
+      );
+    } catch (error) {
+      console.error(
+        `Failed to upload video: ${title} due to error: ${
+          (error as Error).message
+        }`,
+      );
+    } finally {
+      await sleep(60_000 * 1); // 1 mins
+    }
   }
 
   console.log('All videos have been uploaded!');
