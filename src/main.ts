@@ -97,6 +97,10 @@ async function generateScripts() {
           const keywords = getKeywords();
           const newKeywords = keywords.filter((k) => k !== keyword);
           fs.writeFileSync('keywords.txt', newKeywords.join('\n'));
+
+          console.log(
+            `[generateScripts] Generated script with ${keyword} keyword!`,
+          );
         });
       } catch (error) {
         console.error(
@@ -152,7 +156,9 @@ async function generateVideos() {
             taskRes = await retry(() => getTask(videoTaskRes.task_id), 10);
             const { progress } = taskRes;
 
-            console.log({ progress });
+            console.log(
+              `[generateVideos] Generating video with ${script.keyword} keyword progress: ${progress}`,
+            );
             isFinished = progress === 100;
             if (!isFinished) {
               await new Promise((resolve) => setTimeout(resolve, 10_000));
@@ -189,6 +195,10 @@ async function generateVideos() {
             return s;
           });
           fs.writeFileSync('scripts.json', JSON.stringify(newScripts, null, 2));
+
+          console.log(
+            `[generateVideos] Generated video with ${script.keyword} keyword!`,
+          );
         });
       } catch (error) {
         console.error(
@@ -242,7 +252,9 @@ async function generateShortVideos() {
             taskRes = await getTask(videoTaskRes.task_id);
             const { progress } = taskRes;
 
-            console.log({ progress });
+            console.log(
+              `[generateShortVideos] Generating short video with ${script.keyword} keyword progress: ${progress}`,
+            );
             isFinished = progress === 100;
             if (!isFinished) {
               await new Promise((resolve) => setTimeout(resolve, 10_000));
@@ -285,6 +297,10 @@ async function generateShortVideos() {
             return s;
           });
           fs.writeFileSync('scripts.json', JSON.stringify(newScripts, null, 2));
+
+          console.log(
+            `[generateShortVideos] Generated short video with ${script.keyword} keyword!`,
+          );
         });
       },
       {
