@@ -104,6 +104,7 @@ async function generateScripts() {
             (error as Error).message
           }`,
         );
+        await sleep(60_000 * 5); // 5 mins
       } finally {
         await sleep(60_000 * 1); // 1 mins
       }
@@ -317,7 +318,9 @@ async function autoUpload() {
     const { title, description, thumbnail, tags, task_id, isShort } =
       videoScript;
 
-    console.log(`Uploading ${isShort ? 'short' : 'long'} video: ${title}...`);
+    console.log(
+      `[autoUpload] Uploading ${isShort ? 'short' : 'long'} video: ${title}...`,
+    );
     try {
       await uploadVideo({
         title,
@@ -349,13 +352,16 @@ async function autoUpload() {
         JSON.stringify(newVideoScripts, null, 2),
       );
 
-      console.log(`Uploaded ${isShort ? 'short' : 'long'} video: ${title}`);
+      console.log(
+        `[autoUpload] Uploaded ${isShort ? 'short' : 'long'} video: ${title}`,
+      );
     } catch (error) {
       console.error(
-        `Failed to upload video: ${title} due to error: ${
+        `[autoUpload] Failed to upload video: ${title} due to error: ${
           (error as Error).message
         }`,
       );
+      await sleep(60_000 * 5); // 5 mins
     } finally {
       await sleep(60_000 * 1); // 1 mins
     }
