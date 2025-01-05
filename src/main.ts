@@ -67,7 +67,9 @@ async function generateScripts() {
     }
     const genScriptFromKeyword = async (keyword: string) => {
       try {
-        console.log(`Generating script with ${keyword} keyword...`);
+        console.log(
+          `[generateScripts] Generating script with ${keyword} keyword...`,
+        );
         await retry(async () => {
           let scripts = getScripts();
           if (scripts.find((s) => s.keyword === keyword)) {
@@ -98,7 +100,7 @@ async function generateScripts() {
         });
       } catch (error) {
         console.error(
-          `Failed to create script with ${keyword} keyword due to error: ${
+          `[generateScripts] Failed to create script with ${keyword} keyword due to error: ${
             (error as Error).message
           }`,
         );
@@ -111,7 +113,7 @@ async function generateScripts() {
       concurrency: 1,
     });
 
-    console.log('All scripts have been generated!');
+    console.log('[generateScripts] All scripts have been generated!');
     await sleep(60 * 1000); // 1 mins
   }
 }
@@ -289,7 +291,7 @@ async function generateShortVideos() {
       },
     );
 
-    console.log('All short videos have been generated!');
+    console.log('[generateShortVideos] All short videos have been generated!');
     await sleep(30 * 60 * 1000); // 30 mins
   }
 }
