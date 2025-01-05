@@ -100,7 +100,7 @@ async function generateScripts() {
           }`,
         );
       } finally {
-        await sleep(60_000 * 5); // 5 mins
+        await sleep(60_000 * 1); // 1 mins
       }
     };
 
