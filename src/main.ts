@@ -315,7 +315,7 @@ async function autoUpload() {
     const { title, description, thumbnail, tags, task_id, isShort } =
       videoScript;
 
-    console.log(`Uploading video: ${title}...`);
+    console.log(`Uploading ${isShort ? 'short' : 'long'} video: ${title}...`);
     try {
       await uploadVideo({
         title,
@@ -333,7 +333,7 @@ async function autoUpload() {
           .hour(10 + Math.floor(Math.random() * 14))
           .minute(Math.floor(Math.random() * 60))
           .toDate(),
-      }).then(console.log);
+      });
 
       const oldVideoScripts = JSON.parse(
         fs.readFileSync(isShort ? shortVideoPath : longVideoPath, 'utf-8'),
@@ -346,6 +346,8 @@ async function autoUpload() {
         isShort ? shortVideoPath : longVideoPath,
         JSON.stringify(newVideoScripts, null, 2),
       );
+
+      console.log(`Uploaded ${isShort ? 'short' : 'long'} video: ${title}`);
     } catch (error) {
       console.error(
         `Failed to upload video: ${title} due to error: ${
