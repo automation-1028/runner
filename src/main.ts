@@ -112,7 +112,7 @@ async function generateScripts() {
     });
 
     console.log('All scripts have been generated!');
-    await sleep(30 * 60 * 1000); // 30 mins
+    await sleep(60 * 1000); // 1 mins
   }
 }
 
