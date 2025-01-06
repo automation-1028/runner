@@ -70,38 +70,36 @@ async function generateScripts() {
         console.log(
           `[generateScripts] Generating script with ${keyword} keyword...`,
         );
-        await retry(async () => {
-          let scripts = getScripts();
-          if (scripts.find((s) => s.keyword === keyword)) {
-            return;
-          }
-          const videoScript = await generateScript(keyword);
+        let scripts = getScripts();
+        if (scripts.find((s) => s.keyword === keyword)) {
+          return;
+        }
+        const videoScript = await generateScript(keyword);
 
-          scripts = getScripts();
-          const newVideos = [
-            ...scripts,
-            {
-              title: videoScript.title,
-              description: videoScript.description,
-              thumbnail: videoScript.thumbnail,
-              tags: videoScript.tags,
-              script: videoScript.script,
-              keyword,
-              isShortGenerated: false,
-              isLongGenerated: false,
-            },
-          ];
-          fs.writeFileSync('scripts.json', JSON.stringify(newVideos, null, 2));
+        scripts = getScripts();
+        const newVideos = [
+          ...scripts,
+          {
+            title: videoScript.title,
+            description: videoScript.description,
+            thumbnail: videoScript.thumbnail,
+            tags: videoScript.tags,
+            script: videoScript.script,
+            keyword,
+            isShortGenerated: false,
+            isLongGenerated: false,
+          },
+        ];
+        fs.writeFileSync('scripts.json', JSON.stringify(newVideos, null, 2));
 
-          // Remove keyword from keywords.txt
-          const keywords = getKeywords();
-          const newKeywords = keywords.filter((k) => k !== keyword);
-          fs.writeFileSync('keywords.txt', newKeywords.join('\n'));
+        // Remove keyword from keywords.txt
+        const keywords = getKeywords();
+        const newKeywords = keywords.filter((k) => k !== keyword);
+        fs.writeFileSync('keywords.txt', newKeywords.join('\n'));
 
-          console.log(
-            `[generateScripts] Generated script with ${keyword} keyword!`,
-          );
-        });
+        console.log(
+          `[generateScripts] Generated script with ${keyword} keyword!`,
+        );
       } catch (error) {
         console.error(
           `[generateScripts] Failed to create script with ${keyword} keyword due to error: ${
