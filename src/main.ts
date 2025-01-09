@@ -333,7 +333,7 @@ async function generateShortVideos() {
         });
       },
       {
-        concurrency: 2,
+        concurrency: 1,
       },
     );
 
@@ -360,8 +360,8 @@ async function autoUpload() {
   );
   longVideoScripts = longVideoScripts.map((s) => ({ ...s, isLong: true }));
 
-  let videoScripts = [...shortVideoScripts, ...longVideoScripts];
-  videoScripts = _.sampleSize(videoScripts, videoScripts.length);
+  const videoScripts = [...longVideoScripts, ...shortVideoScripts];
+  // videoScripts = _.sampleSize(videoScripts, videoScripts.length);
 
   for (const videoScript of videoScripts) {
     const { title, description, thumbnail, tags, task_id, isShort } =
