@@ -416,7 +416,7 @@ async function autoUpload() {
           (error as Error).message
         }`,
       );
-      await sleep(60_000 * 5); // 5 mins
+      await sleep(60_000 * 60); // 60 mins
     } finally {
       await sleep(60_000 * 1); // 1 mins
     }
