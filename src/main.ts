@@ -71,7 +71,7 @@ async function generateScripts() {
         console.log(
           `${chalk.green(
             `[generateScripts]`,
-          )} Generating script with ${chalk.blue(keyword)} keyword...`,
+          )} Generating script with ${chalk.magenta(keyword)} keyword...`,
         );
 
         let scripts = getScripts();
@@ -104,13 +104,13 @@ async function generateScripts() {
         console.log(
           `${chalk.green(
             '[generateScripts]',
-          )} Generated script with ${chalk.blue(keyword)} keyword!`,
+          )} Generated script with ${chalk.magenta(keyword)} keyword!`,
         );
       } catch (error) {
         console.error(
           `${chalk.green(
             '[generateScripts]',
-          )} Failed to create script with ${chalk.blue(
+          )} Failed to create script with ${chalk.magenta(
             keyword,
           )} keyword due to error: ${(error as Error).message}`,
         );
@@ -140,7 +140,7 @@ async function generateVideos() {
         console.log(
           `${chalk.green(
             '[generateVideos]',
-          )} Generating video with ${chalk.blue(script.keyword)} keyword...`,
+          )} Generating video with ${chalk.magenta(script.keyword)} keyword...`,
         );
 
         await retry(async () => {
@@ -170,7 +170,7 @@ async function generateVideos() {
             console.log(
               `${chalk.green(
                 '[generateVideos]',
-              )} Generating video with ${chalk.blue(
+              )} Generating video with ${chalk.magenta(
                 script.keyword,
               )} keyword progress: ${chalk.yellow(progress)}`,
             );
@@ -214,14 +214,14 @@ async function generateVideos() {
           console.log(
             `${chalk.green(
               '[generateVideos]',
-            )} Generated video with ${chalk.blue(script.keyword)} keyword!`,
+            )} Generated video with ${chalk.magenta(script.keyword)} keyword!`,
           );
         });
       } catch (error) {
         console.error(
           `${chalk.green(
             '[generateVideos]',
-          )} Failed to generate video with ${chalk.blue(
+          )} Failed to generate video with ${chalk.magenta(
             script.keyword,
           )} keyword due to error: ${(error as Error).message}`,
         );
@@ -276,7 +276,7 @@ async function generateShortVideos() {
             console.log(
               `${chalk.green(
                 '[generateShortVideos]',
-              )} Generating short video with ${chalk.blue(
+              )} Generating short video with ${chalk.magenta(
                 script.keyword,
               )} keyword progress: ${chalk.yellow(progress)}`,
             );
@@ -326,7 +326,7 @@ async function generateShortVideos() {
           console.log(
             `${chalk.green(
               '[generateShortVideos]',
-            )} Generated short video with ${chalk.blue(
+            )} Generated short video with ${chalk.magenta(
               script.keyword,
             )} keyword!`,
           );
@@ -350,27 +350,39 @@ async function autoUpload() {
   const shortVideoPath = path.join(__dirname, '../short-videos.json');
   const longVideoPath = path.join(__dirname, '../videos.json');
 
-  let shortVideoScripts: VideoScript[] = JSON.parse(
-    fs.readFileSync(shortVideoPath, 'utf-8'),
-  );
-  shortVideoScripts = shortVideoScripts.map((s) => ({ ...s, isShort: true }));
+  const getVideoScripts = () => {
+    let shortVideoScripts: VideoScript[] = JSON.parse(
+      fs.readFileSync(shortVideoPath, 'utf-8'),
+    );
+    shortVideoScripts = shortVideoScripts.map((s) => ({ ...s, isShort: true }));
 
-  let longVideoScripts: VideoScript[] = JSON.parse(
-    fs.readFileSync(longVideoPath, 'utf-8'),
-  );
-  longVideoScripts = longVideoScripts.map((s) => ({ ...s, isLong: true }));
+    let longVideoScripts: VideoScript[] = JSON.parse(
+      fs.readFileSync(longVideoPath, 'utf-8'),
+    );
+    longVideoScripts = longVideoScripts.map((s) => ({ ...s, isLong: true }));
 
-  const videoScripts = [...longVideoScripts, ...shortVideoScripts];
-  // videoScripts = _.sampleSize(videoScripts, videoScripts.length);
+    const videoScripts = [...longVideoScripts, ...shortVideoScripts];
 
-  for (const videoScript of videoScripts) {
+    return videoScripts;
+  };
+
+  while (true) {
+    const videoScripts = getVideoScripts();
+    const videoScript = videoScripts[0];
+
+    if (!videoScript) {
+      console.log('No video scripts found');
+      sleep(60_000 * 5); // 5 mins
+      return;
+    }
+
     const { title, description, thumbnail, tags, task_id, isShort } =
       videoScript;
 
     console.log(
       `${chalk.green('[autoUpload]')} Uploading ${
         isShort ? 'short' : 'long'
-      } video: ${chalk.blue(title)}`,
+      } video: ${chalk.magenta(title)}`,
     );
     try {
       await uploadVideo({
@@ -406,21 +418,19 @@ async function autoUpload() {
       console.log(
         `${chalk.green('[autoUpload]')} Uploaded ${
           isShort ? 'short' : 'long'
-        } video: ${chalk.blue(title)}`,
+        } video: ${chalk.magenta(title)}`,
       );
     } catch (error) {
       console.error(
         `${chalk.green('[autoUpload]')} Failed to upload ${
           isShort ? 'short' : 'long'
-        } video: ${chalk.blue(title)} due to error: ${
+        } video: ${chalk.magenta(title)} due to error: ${
           (error as Error).message
         }`,
       );
       await sleep(60_000 * 60); // 60 mins
-    } finally {
-      await sleep(60_000 * 1); // 1 mins
     }
-  }
 
-  console.log(`${chalk.green('[autoUpload]')} All videos have been uploaded!`);
+    await sleep(60_000 * 5); // 5 mins
+  }
 }
