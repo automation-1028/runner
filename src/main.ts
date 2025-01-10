@@ -149,12 +149,13 @@ async function generateVideos() {
             return;
           }
 
+          const tagNum = script.tags.split(',').length;
           const videoTaskRes = await generateVideo({
             ...DEFAULT_VIDEO_INFO,
             ...{
               video_subject: script.title,
               video_description: script.description,
-              video_terms: script.tags,
+              video_terms: tagNum >= 5 ? script.tags : '',
               thumbnail: script.thumbnail,
               paragraph_number: 50,
             },
@@ -252,12 +253,13 @@ async function generateShortVideos() {
             return;
           }
 
+          const tagNum = script.tags.split(',').length;
           const videoTaskRes = await generateVideo({
             ...DEFAULT_VIDEO_INFO,
             ...{
               video_subject: script.title,
               video_description: script.description,
-              video_terms: script.tags,
+              video_terms: tagNum >= 5 ? script.tags : '',
               thumbnail: script.thumbnail,
               video_script: '',
               video_aspect: '9:16',
@@ -385,19 +387,15 @@ async function autoUpload() {
       } video: ${chalk.magenta(title)}`,
     );
     try {
-      const tagNum = tags.split(',').length;
       await uploadVideo({
         title,
         description,
         thumbnail: isShort ? '' : thumbnail,
-        tags:
-          tagNum >= 5
-            ? tags // limit 20 tags
-                .split(',')
-                .map((s) => s.trim())
-                .slice(0, 15)
-                .join(', ')
-            : '',
+        tags: tags // limit 20 tags
+          .split(',')
+          .map((s) => s.trim())
+          .slice(0, 15)
+          .join(', '),
         filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
         publishAt: moment()
           .tz('America/New_York')
