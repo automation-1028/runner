@@ -385,15 +385,19 @@ async function autoUpload() {
       } video: ${chalk.magenta(title)}`,
     );
     try {
+      const tagNum = tags.split(',').length;
       await uploadVideo({
         title,
         description,
         thumbnail: isShort ? '' : thumbnail,
-        tags: tags // limit 20 tags
-          .split(',')
-          .map((s) => s.trim())
-          .slice(0, 15)
-          .join(', '),
+        tags:
+          tagNum >= 5
+            ? tags // limit 20 tags
+                .split(',')
+                .map((s) => s.trim())
+                .slice(0, 15)
+                .join(', ')
+            : '',
         filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
         publishAt: moment()
           .tz('America/New_York')
