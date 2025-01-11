@@ -124,9 +124,9 @@ async function generateScripts() {
             keyword,
           )} keyword due to error: ${(error as Error).message}`,
         );
-        await sleep(60_000 * 5); // 5 mins
+        await sleep(60_000 * 30); // 30 mins
       } finally {
-        await sleep(60_000 * 1); // 1 mins
+        await sleep(60_000 * 5); // 1 mins
       }
     };
 
@@ -137,7 +137,7 @@ async function generateScripts() {
     console.log(
       `${chalk.green('[generateScripts]')} All scripts have been generated!`,
     );
-    await sleep(60 * 1000); // 1 mins
+    await sleep(60_000 * 30); // 30 mins
   }
 }
 
@@ -447,6 +447,6 @@ async function autoUpload() {
       await sleep(60_000 * 60); // 60 mins
     }
 
-    await sleep(30); // 1 mins
+    await sleep(6_0000 * 3); // 3 mins
   }
 }
