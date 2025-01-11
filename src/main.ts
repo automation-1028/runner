@@ -437,6 +437,7 @@ async function autoUpload() {
         } video: ${chalk.magenta(title)}`,
       );
     } catch (error) {
+      console.log(error);
       console.error(
         `${chalk.green('[autoUpload]')} Failed to upload ${
           isShort ? 'short' : 'long'
