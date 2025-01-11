@@ -231,7 +231,7 @@ async function generateVideos() {
     };
 
     await Bluebird.Promise.map(scripts, genVideo, {
-      concurrency: 2,
+      concurrency: 1,
     });
 
     console.log(
