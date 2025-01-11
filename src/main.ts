@@ -434,6 +434,6 @@ async function autoUpload() {
       await sleep(60_000 * 60); // 60 mins
     }
 
-    await sleep(60_000 * 5); // 5 mins
+    await sleep(30_000);
   }
 }
