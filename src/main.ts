@@ -164,7 +164,6 @@ async function generateVideos() {
           video_terms: tagNum >= 5 ? script.tags : '',
           thumbnail: script.thumbnail,
           paragraph_number: 50,
-          subtitle_enabled: false,
         },
       } as VideoRequestPayload);
 
