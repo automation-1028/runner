@@ -236,14 +236,14 @@ async function generateVideos() {
 
   while (true) {
     const scripts = getScripts();
-    const script = scripts.find((script) => !script.isLongGenerated);
-    if (!script) {
+    const longScripts = scripts.filter((script) => !script.isLongGenerated);
+    if (!longScripts || longScripts.length === 0) {
       console.log('No long scripts found');
       await sleep(60_000 * 30); // 1 mins
       return;
     }
 
-    await genVideo(script);
+    await Promise.all([genVideo(longScripts[0]), genVideo(longScripts[1])]);
     await sleep(60_000);
   }
 }
