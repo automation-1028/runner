@@ -46,7 +46,7 @@ function getScripts(): Script[] {
 
 generateScripts();
 generateVideos();
-generateShortVideos();
+// generateShortVideos();
 autoUpload();
 async function generateScripts() {
   const getKeywords = () => {
