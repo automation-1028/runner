@@ -51,7 +51,7 @@ export const DEFAULT_VIDEO_INFO = {
   subtitle_enabled: true,
   subtitle_position: 'bottom',
   custom_position: 70.0,
-  font_name: 'MicrosoftYaHeiBold.ttc',
+  font_name: 'Montserrat.ttc',
   text_fore_color: '#FFFFFF',
   text_background_color: true,
   font_size: 60,

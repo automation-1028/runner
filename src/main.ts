@@ -46,7 +46,7 @@ function getScripts(): Script[] {
 
 generateScripts();
 generateVideos();
-generateShortVideos();
+// generateShortVideos();
 autoUpload();
 async function generateScripts() {
   const getKeywords = () => {
@@ -164,7 +164,7 @@ async function generateVideos() {
           video_terms: tagNum >= 5 ? script.tags : '',
           thumbnail: script.thumbnail,
           paragraph_number: 50,
-          video_source: _.sample(['pexels', 'pixabay', 'pixabay', 'pixabay']),
+          video_source: 'pixabay',
         },
       } as VideoRequestPayload);
 
@@ -244,7 +244,10 @@ async function generateVideos() {
       return;
     }
 
-    await Promise.all([genVideo(longScripts[0]), genVideo(longScripts[1])]);
+    await Promise.all([
+      genVideo(longScripts[0]),
+      // genVideo(longScripts[1])
+    ]);
     await sleep(60_000);
   }
 }
@@ -275,9 +278,13 @@ async function generateShortVideos() {
           video_script: '',
           video_aspect: '9:16',
           video_clip_duration: 5,
-          font_size: 50,
-          subtitle_position: 'center',
-          video_source: _.sample(['pexels', 'pixabay', 'pixabay', 'pixabay']),
+          subtitle_position: 'custom',
+          custom_position: 70.0,
+          text_fore_color: '#FFFFFF',
+          font_size: 75,
+          stroke_color: '#000000',
+          stroke_width: 5,
+          video_source: 'pexels',
         },
       } as VideoRequestPayload);
 
