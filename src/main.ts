@@ -351,14 +351,17 @@ async function generateShortVideos() {
 
   while (true) {
     const scripts = getScripts();
-    const script = scripts.find((script) => !script.isShortGenerated);
-    if (!script) {
+    const shortScripts = scripts.filter((script) => !script.isShortGenerated);
+    if (!shortScripts || shortScripts.length === 0) {
       console.log('No short scripts found');
       await sleep(60_000 * 30); // 1 mins
       return;
     }
 
-    await genVideo(script);
+    await Promise.all([
+      genVideo(shortScripts[0]),
+      // genVideo(shortScripts[1])
+    ]);
     await sleep(60_000);
   }
 }
