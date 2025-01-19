@@ -388,14 +388,14 @@ async function autoUpload() {
     );
     longVideoScripts = longVideoScripts.map((s) => ({ ...s, isLong: true }));
 
-    const videoScripts = [...longVideoScripts, ...shortVideoScripts];
+    const videoScripts = [...shortVideoScripts, ...longVideoScripts];
 
     return videoScripts;
   };
 
   while (true) {
     const videoScripts = getVideoScripts();
-    const videoScript = videoScripts[0];
+    const videoScript = videoScripts.pop();
 
     if (!videoScript) {
       console.log('No video scripts found');
