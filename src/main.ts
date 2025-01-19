@@ -46,7 +46,7 @@ function getScripts(): Script[] {
 
 generateScripts();
 generateVideos();
-// generateShortVideos();
+generateShortVideos();
 autoUpload();
 async function generateScripts() {
   const getKeywords = () => {
@@ -164,7 +164,7 @@ async function generateVideos() {
           video_terms: tagNum >= 5 ? script.tags : '',
           thumbnail: script.thumbnail,
           paragraph_number: 50,
-          video_source: 'pixabay',
+          video_source: 'pexels',
         },
       } as VideoRequestPayload);
 
