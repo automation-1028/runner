@@ -244,10 +244,7 @@ async function generateVideos() {
       return;
     }
 
-    await Promise.all([
-      genVideo(longScripts[0]),
-      // genVideo(longScripts[1])
-    ]);
+    await Promise.all([genVideo(longScripts[0]), genVideo(longScripts[1])]);
     await sleep(60_000);
   }
 }
@@ -365,10 +362,7 @@ async function generateShortVideos() {
       return;
     }
 
-    await Promise.all([
-      genVideo(shortScripts[0]),
-      // genVideo(shortScripts[1])
-    ]);
+    await Promise.all([genVideo(shortScripts[0]), genVideo(shortScripts[1])]);
     await sleep(60_000);
   }
 }
