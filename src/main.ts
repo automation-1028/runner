@@ -411,7 +411,7 @@ async function autoUpload() {
         description,
         thumbnail: isShort ? '' : thumbnail,
         tags: tags
-          .substring(0, 500)
+          .substring(0, 480)
           .split(',')
           .map((s) => s.trim())
           .join(', '),
