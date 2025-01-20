@@ -406,15 +406,14 @@ async function autoUpload() {
       } video: ${chalk.magenta(title)}`,
     );
     try {
+      const videoTags = tags.substring(0, 480).split(',');
+      videoTags.pop();
+
       await uploadVideo({
         title,
         description,
         thumbnail: isShort ? '' : thumbnail,
-        tags: tags
-          .substring(0, 480)
-          .split(',')
-          .map((s) => s.trim())
-          .join(', '),
+        tags: videoTags.slice(0, 15).join(', '),
         filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
         publishAt: moment()
           .tz('America/New_York')
