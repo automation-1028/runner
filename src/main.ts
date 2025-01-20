@@ -410,10 +410,10 @@ async function autoUpload() {
         title,
         description,
         thumbnail: isShort ? '' : thumbnail,
-        tags: tags // limit 20 tags
+        tags: tags
+          .substring(0, 500)
           .split(',')
           .map((s) => s.trim())
-          .slice(0, 15)
           .join(', '),
         filePath: `${process.env.VIDEO_TASK_DIR}/${task_id}/final-1.mp4`,
         publishAt: moment()
