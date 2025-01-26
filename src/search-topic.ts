@@ -9,6 +9,7 @@ import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
 import { getSentenceSimilarity } from './utils/similarity.util';
+import _ from 'lodash';
 
 const priotizeTopics = [
   'travel',
@@ -174,9 +175,10 @@ async function searchKeyword() {
 
 async function setPriorityKeywords() {
   while (true) {
-    const keywords = await Keyword.find({
+    let keywords = await Keyword.find({
       priority: { $lt: 1 },
     });
+    keywords = _.sampleSize(keywords, 100);
 
     for (const keyword of keywords) {
       let isVerySimilar = false;
