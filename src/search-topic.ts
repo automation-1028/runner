@@ -7,6 +7,7 @@ import { classifyKeyword } from './services/open-ai';
 import { Keyword } from './models/keyword';
 import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
+import { isEnglishWord } from './utils/english.util';
 
 class TopicManager {
   // travel
@@ -99,6 +100,18 @@ async function searchKeyword() {
                     overall,
                     estimated_monthly_search,
                   } = question;
+
+                  // Skip non-English keywords
+                  if (!isEnglishWord(questionKeyword)) {
+                    console.log(
+                      `${chalk.yellow(
+                        `[searchKeyword]`,
+                      )} Skipping non-English keyword: ${chalk.magenta(
+                        questionKeyword,
+                      )}`,
+                    );
+                    return;
+                  }
 
                   const topic = await classifyKeyword(questionKeyword);
 
