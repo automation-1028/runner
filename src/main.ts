@@ -17,6 +17,7 @@ import { retry } from './utils/retry.util';
 import { sleep } from './utils/sleep.util';
 import { generateScripts } from './generate-script';
 import { searchKeyword } from './search-topic';
+import { IScript, Keyword, KeywordDocument } from './models/keyword';
 
 interface ScriptBase {
   title: string;
@@ -31,20 +32,6 @@ interface VideoScript extends ScriptBase {
   isLong?: boolean;
 }
 
-interface Script extends ScriptBase {
-  keyword: string;
-  isShortGenerated: boolean;
-  isLongGenerated: boolean;
-}
-
-function getScripts(): Script[] {
-  const scripts = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../scripts.json'), 'utf-8'),
-  );
-
-  return scripts;
-}
-
 searchKeyword();
 generateScripts();
 generateVideos();
@@ -52,18 +39,14 @@ generateShortVideos();
 autoUpload();
 
 async function generateVideos() {
-  const genVideo = async (script: Script) => {
+  const genVideo = async (keyword: KeywordDocument) => {
+    const script = keyword.script as IScript;
     try {
       console.log(
         `${chalk.green(
           '[generateVideos]',
         )} Generating video with ${chalk.magenta(script.keyword)} keyword...`,
       );
-
-      // check if video already exists
-      if (script.isLongGenerated) {
-        return;
-      }
 
       const tagNum = script.tags.split(',').length;
       const videoTaskRes = await generateVideo({
@@ -116,18 +99,11 @@ async function generateVideos() {
       ];
       fs.writeFileSync('videos.json', JSON.stringify(newVideos, null, 2));
 
-      // Update scripts.json
-      const oldScripts = getScripts();
-      const newScripts = oldScripts.map((s) => {
-        if (s.keyword === script.keyword) {
-          return {
-            ...s,
-            isLongGenerated: true,
-          };
-        }
-        return s;
-      });
-      fs.writeFileSync('scripts.json', JSON.stringify(newScripts, null, 2));
+      // Update keyword
+      await Keyword.updateOne(
+        { _id: keyword._id },
+        { $set: { 'script.isLongGenerated': true } },
+      );
 
       console.log(
         `${chalk.green(
@@ -146,26 +122,19 @@ async function generateVideos() {
   };
 
   while (true) {
-    const scripts = getScripts();
-    const longScripts = scripts.filter((script) => !script.isLongGenerated);
-    if (!longScripts || longScripts.length === 0) {
-      console.log('No long scripts found');
-      await sleep(60_000 * 30); // 1 mins
-      return;
-    }
+    const keywords = await Keyword.find({
+      'script.isLongGenerated': false,
+    });
 
-    await Promise.all([genVideo(longScripts[0]), genVideo(longScripts[1])]);
+    await Promise.all([genVideo(keywords[0]), genVideo(keywords[1])]);
     await sleep(60_000);
   }
 }
 
 async function generateShortVideos() {
-  const genVideo = async (script: Script) => {
+  const genVideo = async (keyword: KeywordDocument) => {
+    const script = keyword.script as IScript;
     try {
-      // check if video already exists
-      if (script.isShortGenerated) {
-        return;
-      }
       console.log(
         `${chalk.green(
           '[generateShortVideos]',
@@ -232,18 +201,11 @@ async function generateShortVideos() {
       ];
       fs.writeFileSync('short-videos.json', JSON.stringify(newVideos, null, 2));
 
-      // Update scripts.json
-      const oldScripts = getScripts();
-      const newScripts = oldScripts.map((s) => {
-        if (s.keyword === script.keyword) {
-          return {
-            ...s,
-            isShortGenerated: true,
-          };
-        }
-        return s;
-      });
-      fs.writeFileSync('scripts.json', JSON.stringify(newScripts, null, 2));
+      // Update keyword
+      await Keyword.updateOne(
+        { _id: keyword._id },
+        { $set: { 'script.isShortGenerated': true } },
+      );
 
       console.log(
         `${chalk.green(
@@ -264,15 +226,11 @@ async function generateShortVideos() {
   };
 
   while (true) {
-    const scripts = getScripts();
-    const shortScripts = scripts.filter((script) => !script.isShortGenerated);
-    if (!shortScripts || shortScripts.length === 0) {
-      console.log('No short scripts found');
-      await sleep(60_000 * 30); // 1 mins
-      return;
-    }
+    const keywords = await Keyword.find({
+      'script.isShortGenerated': false,
+    });
 
-    await Promise.all([genVideo(shortScripts[0]), genVideo(shortScripts[1])]);
+    await Promise.all([genVideo(keywords[0]), genVideo(keywords[1])]);
     await sleep(60_000);
   }
 }
