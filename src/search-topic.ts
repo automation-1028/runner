@@ -69,7 +69,7 @@ async function searchKeyword() {
       return;
     }
 
-    const currentTopic = topics.shift();
+    const currentTopic = topics.pop();
     if (!currentTopic) continue;
 
     try {
@@ -140,7 +140,7 @@ async function searchKeyword() {
                     )} under topic: ${chalk.magenta(topic)}`,
                   );
 
-                  await sleep(1000); // Rate limiting
+                  await sleep(10_000); // Rate limiting
                 },
                 {
                   concurrency: 1,
@@ -152,6 +152,7 @@ async function searchKeyword() {
                   (error as Error).message
                 }`,
               );
+              await sleep(60_000 * 5); // Wait 5 minutes before retrying
             }
           },
           {
@@ -166,7 +167,7 @@ async function searchKeyword() {
           (error as Error).message
         }`,
       );
-      await sleep(60000); // Wait 1 minute before retrying
+      await sleep(60_000 * 30); // Wait 30 minutes before retrying
     }
   }
 }
