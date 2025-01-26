@@ -10,7 +10,8 @@ async function generateScripts() {
   while (true) {
     const keyword = await Keyword.findOne({
       isGeneratedScript: false,
-    });
+    }).sort({ priority: -1 });
+
     if (!keyword) {
       console.log(`${chalk.green('[generateScripts]')} No keywords found`);
 

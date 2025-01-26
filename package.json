@@ -5,6 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "dev": "dotenv -e .env -- ts-node-dev --transpile-only ./src/main.ts",
+    "test": "dotenv -e .env -- ts-node-dev --transpile-only ./src/utils/similarity.util.ts",
     "build": "tsup --config build.ts",
     "start": "dotenv -e .env -- node ./dist/main.js",
     "lint": "eslint",
@@ -38,6 +39,7 @@
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.46",
     "mongoose": "^8.9.5",
+    "natural": "^8.0.1",
     "openai": "^4.80.0",
     "youtube-videos-uploader": "^2.0.26",
     "zod": "^3.21.4"

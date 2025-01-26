@@ -8,19 +8,22 @@ import { Keyword } from './models/keyword';
 import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
+import { getSentenceSimilarity } from './utils/similarity.util';
 
+const priotizeTopics = [
+  'travel',
+  'food',
+  'exploration',
+  'culture',
+  'motivation',
+  'mindfulness',
+  'psychology',
+  'leadership',
+  'selfhelp',
+  'life experiences',
+  'personal growth',
+];
 class TopicManager {
-  // travel
-  // food
-  // exploration
-  // culture
-  // motivation
-  // mindfulness
-  // psychology
-  // leadership
-  // selfhelp
-  // Life Experiences
-  // Personal Growth
   private topicPath: string;
 
   constructor(topicPath: string) {
@@ -50,6 +53,8 @@ class TopicManager {
 }
 
 async function searchKeyword() {
+  setPriorityKeywords();
+
   const topicManager = new TopicManager(
     path.join(__dirname, '../my-topic.txt'),
   );
@@ -162,6 +167,27 @@ async function searchKeyword() {
         }`,
       );
       await sleep(60000); // Wait 1 minute before retrying
+    }
+  }
+}
+
+async function setPriorityKeywords() {
+  while (true) {
+    const keywords = await Keyword.find({
+      priority: { $lt: 1 },
+    });
+
+    for (const keyword of keywords) {
+      let isVerySimilar = false;
+      let isSimilar = false;
+
+      for (const topic of priotizeTopics) {
+        isVerySimilar = getSentenceSimilarity(keyword.topic, topic) > 0.7;
+        isSimilar = getSentenceSimilarity(keyword.topic, topic) > 0.5;
+      }
+
+      keyword.priority = isVerySimilar ? 1 : isSimilar ? 0.5 : 0;
+      await keyword.save();
     }
   }
 }

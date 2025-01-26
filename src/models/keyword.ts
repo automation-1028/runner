@@ -22,6 +22,7 @@ export interface IKeyword {
   topic: string;
   isGeneratedScript: boolean;
   script?: IScript;
+  priority: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,6 +52,7 @@ const KeywordSchema = new Schema<KeywordDocument>(
         isLongGenerated: { type: Boolean, default: false },
       },
     },
+    priority: { type: Number, default: 0 },
   },
   { timestamps: true },
 );
