@@ -24,6 +24,7 @@ interface ScriptBase {
   description: string;
   thumbnail: string;
   tags: string;
+  topic: string;
 }
 
 interface VideoScript extends ScriptBase {
@@ -93,6 +94,7 @@ async function generateVideos() {
             description: script.description,
             thumbnail: script.thumbnail,
             tags: script.tags,
+            topic: keyword.topic,
           },
           ...videoTaskRes,
         },
@@ -195,6 +197,7 @@ async function generateShortVideos() {
             description: script.description,
             thumbnail: script.thumbnail,
             tags: script.tags,
+            topic: keyword.topic,
           },
           ...videoTaskRes,
         },
