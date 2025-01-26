@@ -5,17 +5,18 @@ import 'dotenv/config';
 import _ from 'lodash';
 import chalk from 'chalk';
 
+import './configs/mongoose';
 import {
   generateVideo,
   DEFAULT_VIDEO_INFO,
   VideoRequestPayload,
   getTask,
 } from './services/video-generator';
-import { generateScript } from './services/script-generator';
 import { uploadVideo } from './services/youtube-uploader';
-import Bluebird from 'bluebird';
 import { retry } from './utils/retry.util';
 import { sleep } from './utils/sleep.util';
+import { generateScripts } from './generate-script';
+import { searchKeyword } from './search-topic';
 
 interface ScriptBase {
   title: string;
@@ -44,102 +45,11 @@ function getScripts(): Script[] {
   return scripts;
 }
 
+searchKeyword();
 generateScripts();
 generateVideos();
 generateShortVideos();
 autoUpload();
-async function generateScripts() {
-  const getKeywords = () => {
-    const keywords = fs
-      .readFileSync(path.join(__dirname, '../keywords.txt'), 'utf-8')
-      .split('\n')
-      .map((k) => k.trim())
-      .filter((k) => !!k);
-
-    return keywords;
-  };
-
-  while (true) {
-    const keywords = getKeywords();
-
-    if (keywords.length === 0) {
-      console.log('No keywords found in keywords.txt');
-      return;
-    }
-    const genScriptFromKeyword = async (keyword: string) => {
-      try {
-        console.log(
-          `${chalk.green(
-            `[generateScripts]`,
-          )} Generating script with ${chalk.magenta(keyword)} keyword...`,
-        );
-
-        let scripts = getScripts();
-        if (scripts.find((s) => s.keyword === keyword)) {
-          // Remove keyword from keywords.txt
-          const keywords = getKeywords();
-          const newKeywords = keywords.filter((k) => k !== keyword);
-          fs.writeFileSync('keywords.txt', newKeywords.join('\n'));
-
-          console.log(
-            `${chalk.green('[generateScripts]')} Script with ${chalk.magenta(
-              keyword,
-            )} keyword already exists!`,
-          );
-          return;
-        }
-        const videoScript = await generateScript(keyword);
-
-        scripts = getScripts();
-        const newVideos = [
-          ...scripts,
-          {
-            title: videoScript.title,
-            description: videoScript.description,
-            thumbnail: videoScript.thumbnail,
-            tags: videoScript.tags,
-            script: videoScript.script,
-            keyword,
-            isShortGenerated: false,
-            isLongGenerated: false,
-          },
-        ];
-        fs.writeFileSync('scripts.json', JSON.stringify(newVideos, null, 2));
-
-        // Remove keyword from keywords.txt
-        const keywords = getKeywords();
-        const newKeywords = keywords.filter((k) => k !== keyword);
-        fs.writeFileSync('keywords.txt', newKeywords.join('\n'));
-
-        console.log(
-          `${chalk.green(
-            '[generateScripts]',
-          )} Generated script with ${chalk.magenta(keyword)} keyword!`,
-        );
-      } catch (error) {
-        console.error(
-          `${chalk.green(
-            '[generateScripts]',
-          )} Failed to create script with ${chalk.magenta(
-            keyword,
-          )} keyword due to error: ${(error as Error).message}`,
-        );
-        await sleep(60_000 * 30); // 30 mins
-      } finally {
-        await sleep(60_000 * 5); // 1 mins
-      }
-    };
-
-    await Bluebird.Promise.map(keywords, genScriptFromKeyword, {
-      concurrency: 1,
-    });
-
-    console.log(
-      `${chalk.green('[generateScripts]')} All scripts have been generated!`,
-    );
-    await sleep(60_000 * 30); // 30 mins
-  }
-}
 
 async function generateVideos() {
   const genVideo = async (script: Script) => {
