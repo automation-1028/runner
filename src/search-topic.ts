@@ -109,6 +109,7 @@ async function searchKeyword() {
                       volume,
                       overall,
                       estimatedMonthlySearch: estimated_monthly_search,
+                      topic,
                     },
                     { upsert: true },
                   );
