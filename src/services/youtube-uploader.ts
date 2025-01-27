@@ -11,6 +11,7 @@ export interface UploadVideoRequest {
   description: string;
   filePath: string;
   publishAt?: Date;
+  channel: string;
 }
 
 export const uploadVideo = async (payload: UploadVideoRequest) => {

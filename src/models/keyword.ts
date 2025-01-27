@@ -9,8 +9,10 @@ interface IScriptBase {
 
 export interface IScript extends IScriptBase {
   keyword: string;
-  isShortGenerated: boolean;
-  isLongGenerated: boolean;
+}
+
+export interface IVideo {
+  taskId: string;
 }
 
 export interface IKeyword {
@@ -22,6 +24,11 @@ export interface IKeyword {
   topic: string;
   isGeneratedScript: boolean;
   script?: IScript;
+  video: IVideo;
+  isShortGenerated: boolean;
+  isLongGenerated: boolean;
+  shortVideo?: IVideo;
+  longVideo?: IVideo;
   priority: number;
   createdAt: Date;
   updatedAt: Date;
@@ -48,8 +55,18 @@ const KeywordSchema = new Schema<KeywordDocument>(
         thumbnail: { type: String, required: true },
         tags: { type: String, required: true },
         keyword: { type: String, required: true },
-        isShortGenerated: { type: Boolean, default: false },
-        isLongGenerated: { type: Boolean, default: false },
+      },
+    },
+    isShortGenerated: { type: Boolean, default: false },
+    isLongGenerated: { type: Boolean, default: false },
+    video: {
+      type: {
+        taskId: { type: String, required: true },
+      },
+    },
+    longVideo: {
+      type: {
+        taskId: { type: String, required: true },
       },
     },
     priority: { type: Number, default: 0 },
