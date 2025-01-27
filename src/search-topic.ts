@@ -3,7 +3,7 @@ import path from 'path';
 import chalk from 'chalk';
 import { Promise } from 'bluebird';
 
-import { classifyKeyword } from './services/open-ai';
+import { classifyKeyword } from './services/classify';
 import { Keyword } from './models/keyword';
 import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
