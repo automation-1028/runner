@@ -21,10 +21,6 @@ async function generateScripts() {
 
     await _genScriptFromKeyword(keyword);
 
-    console.log(
-      `${chalk.green('[generateScripts]')} All scripts have been generated!`,
-    );
-
     await sleep(60_000 * 3); // 3 mins
   }
 }
