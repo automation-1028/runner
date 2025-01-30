@@ -5,6 +5,7 @@ export interface IChannel {
   topics: string[];
   maxDailyShortVideosLimit: number;
   maxDailyLongVideosLimit: number;
+  chromeProfileId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +18,7 @@ const ChannelSchema = new Schema<ChannelDocument>(
     topics: [{ type: String, required: true }],
     maxDailyShortVideosLimit: { type: Number, required: true },
     maxDailyLongVideosLimit: { type: Number, required: true },
+    chromeProfileId: { type: String, required: true },
   },
   { timestamps: true },
 );

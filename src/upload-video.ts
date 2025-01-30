@@ -8,7 +8,7 @@ import { Channel, ChannelDocument } from './models/channel';
 import { IScript, IVideo, Keyword } from './models/keyword';
 import { Upload } from './models/upload';
 
-async function _uploadVideoByType(
+async function _scheduleUploadVideoByType(
   channel: ChannelDocument,
   videoType: 'short' | 'long',
 ) {
@@ -17,8 +17,8 @@ async function _uploadVideoByType(
 
   console.log(
     `${chalk.green(
-      '[autoUpload]',
-    )} Uploading ${videoType} videos for channel: ${chalk.magenta(name)}`,
+      '[scheduleToUpload]',
+    )} Scheduling ${videoType} videos for channel: ${chalk.magenta(name)}`,
   );
 
   try {
@@ -48,7 +48,7 @@ async function _uploadVideoByType(
       ) {
         console.log(
           `${chalk.green(
-            '[autoUpload]',
+            '[scheduleToUpload]',
           )} ${videoType} video limit reached for channel: ${chalk.magenta(
             name,
           )}`,
@@ -56,61 +56,101 @@ async function _uploadVideoByType(
         break;
       }
 
-      const script = keyword.script as IScript;
-      const { title, description, thumbnail, tags } = script;
-      const video = (
-        videoType === 'short' ? keyword.shortVideo : keyword.longVideo
-      ) as IVideo;
-
-      const videoTags = tags.substring(0, 480).split(',');
-      videoTags.pop();
-
-      await uploadVideo({
-        title,
-        description,
-        thumbnail: videoType === 'short' ? '' : thumbnail,
-        tags: videoTags.slice(0, 15).join(', '),
-        filePath: `${process.env.VIDEO_TASK_DIR}/${video.taskId}/final-1.mp4`,
+      await Upload.create({
+        channelId: channel._id,
+        keywordId: keyword._id,
+        videoType,
+        visibility: 'unlisted',
         publishAt: moment()
           .tz('America/New_York')
           .add(1, 'days')
           .hour(10 + Math.floor(Math.random() * 14))
           .minute(Math.floor(Math.random() * 60))
           .toDate(),
-        channel: name,
-      });
-
-      await Upload.create({
-        channelId: channel._id,
-        keywordId: keyword._id,
-        videoType,
       });
 
       console.log(
         `${chalk.green(
-          '[autoUpload]',
-        )} Uploaded ${videoType} video: ${chalk.magenta(title)}`,
+          '[scheduleToUpload]',
+        )} Scheduled ${videoType} video upload for channel: ${chalk.magenta(
+          name,
+        )}`,
       );
     }
   } catch (error) {
     console.error(
-      `${chalk.green(
-        '[autoUpload]',
-      )} Failed to upload ${videoType} videos for channel: ${chalk.magenta(
+      `${chalk.red(
+        '[scheduleToUpload]',
+      )} Error Scheduling ${videoType} videos for channel: ${chalk.magenta(
         name,
-      )} due to error: ${(error as Error).message}`,
+      )}`,
+      error,
     );
   } finally {
     await sleep(60_000 * 5); // Wait 5 minutes before uploading next video
   }
 }
-async function autoUpload() {
+async function scheduleToUpload() {
   const channels = await Channel.find({}).exec();
 
   for (const channel of channels) {
-    await _uploadVideoByType(channel, 'short');
-    await _uploadVideoByType(channel, 'long');
+    await _scheduleUploadVideoByType(channel, 'short');
+    await _scheduleUploadVideoByType(channel, 'long');
   }
 }
 
-export { autoUpload };
+async function uploadVideoCronJob() {
+  while (true) {
+    try {
+      const uploads = await Upload.find({
+        publishAt: {
+          $lte: new Date(),
+        },
+        visibility: 'unlisted',
+      });
+
+      for (const upload of uploads) {
+        const keyword = await Keyword.findById(upload.keywordId);
+        if (!keyword) {
+          continue;
+        }
+
+        const channel = await Channel.findById(upload.channelId);
+        if (!channel) {
+          continue;
+        }
+
+        const script = keyword.script as IScript;
+        const { title, description, thumbnail, tags } = script;
+        const video = (
+          upload.videoType === 'short' ? keyword.shortVideo : keyword.longVideo
+        ) as IVideo;
+
+        const videoTags = tags.substring(0, 480).split(',');
+        videoTags.pop();
+
+        await uploadVideo({
+          title,
+          description,
+          thumbnail: upload.videoType === 'short' ? '' : thumbnail,
+          tags: videoTags.slice(0, 15).join(', '),
+          filePath: `${process.env.VIDEO_TASK_DIR}/${video.taskId}/final-1.mp4`,
+          chromeProfileId: channel.chromeProfileId,
+        });
+
+        await Upload.findByIdAndUpdate(upload._id, {
+          visibility: 'public',
+        });
+      }
+    } catch (error) {
+      console.error(
+        `${chalk.red('[uploadVideoCronJob]')} Error uploading video`,
+        error,
+      );
+    } finally {
+      await sleep(60_000 * 5); // Wait 5 minutes before checking next
+    }
+  }
+}
+
+export { scheduleToUpload, uploadVideoCronJob };

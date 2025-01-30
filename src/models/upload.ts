@@ -5,7 +5,9 @@ import { KeywordDocument } from './keyword';
 export interface IUpload {
   channelId: mongoose.Types.ObjectId | ChannelDocument;
   keywordId: mongoose.Types.ObjectId | KeywordDocument;
+  visibility: 'public' | 'private' | 'unlisted';
   videoType: 'short' | 'long';
+  publishAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +31,7 @@ const UploadSchema = new Schema<UploadDocument>(
       enum: ['short', 'long'],
       required: true,
     },
+    publishAt: { type: Date },
   },
   { timestamps: true },
 );

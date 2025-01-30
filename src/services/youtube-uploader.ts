@@ -10,8 +10,7 @@ export interface UploadVideoRequest {
   tags: string;
   description: string;
   filePath: string;
-  publishAt?: Date;
-  channel: string;
+  chromeProfileId: string;
 }
 
 export const uploadVideo = async (payload: UploadVideoRequest) => {
