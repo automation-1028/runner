@@ -28,7 +28,7 @@ async function _scheduleUploadVideoByType(
 
       ...(videoType === 'short' && { isShortGenerated: true }),
       ...(videoType === 'long' && { isLongGenerated: true }),
-    });
+    }).sort({ priority: -1 });
 
     for (const keyword of keywords) {
       const todayUpload = await Upload.find({
