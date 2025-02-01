@@ -31,7 +31,7 @@ const classifyKeyword = async (
 
     if (provider === 'ollama') {
       const response = await ollama.chat.completions.create({
-        model: process.env.OLLAMA_MODEL || 'deepseek-r1:32b',
+        model: process.env.OLLAMA_MODEL || 'deepseek-r1:1.5b',
         messages: [
           { role: 'system', content: prompt },
           { role: 'user', content: keyword },
