@@ -1,8 +1,7 @@
-import ollama from 'ollama';
-
 import { openai } from '../configs/openai';
 import { extractContent } from '../utils/deepseek.util';
 import { deepseek } from '../configs/deepseek';
+import { ollama } from '../configs/ollama';
 
 const VALID_TOPICS = [
   'travel',
@@ -31,15 +30,17 @@ const classifyKeyword = async (
     let result: string | undefined;
 
     if (provider === 'ollama') {
-      const response = await ollama.chat({
-        model: process.env.OLLAMA_MODEL || 'deepseek-r1:14b',
+      const response = await ollama.chat.completions.create({
+        model: process.env.OLLAMA_MODEL || 'deepseek-r1:32b',
         messages: [
           { role: 'system', content: prompt },
           { role: 'user', content: keyword },
         ],
       });
 
-      result = extractContent(response.message.content).toLowerCase();
+      result = extractContent(
+        response.choices[0].message.content || '',
+      ).toLowerCase();
     } else if (provider === 'deepseek') {
       const response = await deepseek.chat.completions.create({
         model: process.env.DEEPSEEK_MODEL || 'deepseek/deepseek-r1',

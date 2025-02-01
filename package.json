@@ -43,7 +43,6 @@
     "moment-timezone": "^0.5.46",
     "mongoose": "^8.9.5",
     "natural": "^8.0.1",
-    "ollama": "^0.5.12",
     "openai": "^4.80.0",
     "youtube-videos-uploader": "^2.0.26",
     "zod": "^3.21.4"
