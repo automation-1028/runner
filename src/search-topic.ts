@@ -2,14 +2,13 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import { Promise } from 'bluebird';
+import _ from 'lodash';
 
 import { classifyKeyword } from './services/classify';
 import { Keyword } from './models/keyword';
 import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
-import { getSentenceSimilarity } from './utils/similarity.util';
-import _ from 'lodash';
 
 const priotizeTopics = [
   'travel',
@@ -24,6 +23,7 @@ const priotizeTopics = [
   'life experiences',
   'personal growth',
 ];
+
 class TopicManager {
   private topicPath: string;
 
@@ -54,8 +54,6 @@ class TopicManager {
 }
 
 async function searchKeyword() {
-  setPriorityKeywords();
-
   const topicManager = new TopicManager(
     path.join(__dirname, '../my-topic.txt'),
   );
@@ -120,6 +118,7 @@ async function searchKeyword() {
                   }
 
                   const topic = await classifyKeyword(questionKeyword);
+                  const priority = priotizeTopics.includes(topic) ? 1 : 0;
 
                   await Keyword.findOneAndUpdate(
                     { keyword: questionKeyword },
@@ -129,6 +128,7 @@ async function searchKeyword() {
                       overall,
                       estimatedMonthlySearch: estimated_monthly_search,
                       topic,
+                      priority,
                     },
                     { upsert: true },
                   );
@@ -175,24 +175,46 @@ async function searchKeyword() {
 
 async function setPriorityKeywords() {
   while (true) {
-    let keywords = await Keyword.find({
-      priority: { $lt: 1 },
-    });
-    keywords = _.sampleSize(keywords, 100);
-
+    const keywords = await Keyword.aggregate([
+      { $match: { $sampleRate: 0.33, priority: { $ne: 1 } } },
+    ]);
     for (const keyword of keywords) {
-      let isVerySimilar = false;
-      let isSimilar = false;
+      const priority = priotizeTopics.includes(keyword.topic) ? 1 : 0;
 
-      for (const topic of priotizeTopics) {
-        isVerySimilar = getSentenceSimilarity(keyword.topic, topic) > 0.7;
-        isSimilar = getSentenceSimilarity(keyword.topic, topic) > 0.5;
-      }
-
-      keyword.priority = isVerySimilar ? 1 : isSimilar ? 0.5 : 0;
-      await keyword.save();
+      console.log(
+        `${chalk.green(
+          `[setPriorityKeywords]`,
+        )} Setting priority for keyword: ${chalk.magenta(
+          keyword.keyword,
+        )} to ${chalk.magenta(priority.toString())}`,
+      );
+      await Keyword.updateOne(
+        { _id: keyword._id },
+        {
+          $set: {
+            priority,
+          },
+        },
+      );
     }
   }
 }
 
-export { searchKeyword };
+// function calculatePriority(comparedTopic: string): number {
+//   let isVerySimilar = false;
+//   let isSimilar = false;
+
+//   priotizeTopics.forEach((topic) => tfidf.addDocument(topic));
+//   tfidf.tfidfs(comparedTopic, (_, measure, key) => {
+//     console.log(2, key, measure);
+//   });
+
+//   for (const topic of priotizeTopics) {
+//     isVerySimilar = getSentenceSimilarity(comparedTopic, topic) > 0.7;
+//     isSimilar = getSentenceSimilarity(comparedTopic, topic) > 0.5;
+//   }
+
+//   return isVerySimilar ? 1 : isSimilar ? 0.5 : 0;
+// }
+
+export { searchKeyword, setPriorityKeywords };
