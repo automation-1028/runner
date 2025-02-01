@@ -167,7 +167,7 @@ async function searchKeyword() {
           (error as Error).message
         }`,
       );
-      await sleep(60_000 * 30); // Wait 30 minutes before retrying
+      await sleep(60_000); // Wait 30 minutes before retrying
     }
   }
 }
