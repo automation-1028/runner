@@ -14,7 +14,6 @@ import { IScript, Keyword, KeywordDocument } from './models/keyword';
 
 async function generateVideos() {
   const genVideo = async (keyword: KeywordDocument) => {
-    console.log(keyword);
     const script = keyword.script as IScript;
     try {
       console.log(
@@ -85,7 +84,7 @@ async function generateVideos() {
 
   while (true) {
     const keywords = await Keyword.find({
-      isLongGenerated: false,
+      isLongGenerated: true,
     }).sort({ priority: -1 });
 
     if (_.isEmpty(keywords)) {
@@ -184,7 +183,7 @@ async function generateShortVideos() {
 
   while (true) {
     const keywords = await Keyword.find({
-      isShortGenerated: false,
+      isShortGenerated: true,
     }).sort({ priority: -1 });
 
     if (_.isEmpty(keywords)) {
