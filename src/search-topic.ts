@@ -144,7 +144,7 @@ async function searchKeyword() {
                   // await sleep(60_000 * 30); // Rate limiting
                 },
                 {
-                  concurrency: 1,
+                  concurrency: 2,
                 },
               );
             } catch (error) {
