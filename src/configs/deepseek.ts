@@ -2,7 +2,8 @@ import OpenAI from 'openai';
 
 const deepseek = new OpenAI({
   apiKey:
-    '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',
+    process.env.DEEPSEEK_API_KEY ||
+    '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',
   baseURL: 'https://openrouter.ai/api/v1',
 });
 
