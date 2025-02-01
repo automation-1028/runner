@@ -59,7 +59,7 @@ const KeywordSchema = new Schema<KeywordDocument>(
     },
     isShortGenerated: { type: Boolean, default: false },
     isLongGenerated: { type: Boolean, default: false },
-    video: {
+    shortVideo: {
       type: {
         taskId: { type: String, required: true },
       },
