@@ -21,7 +21,7 @@ const VALID_TOPICS = [
 
 const classifyKeyword = async (
   keyword: string,
-  provider: 'openai' | 'ollama' | 'deepseek' = 'deepseek',
+  provider: 'openai' | 'ollama' | 'deepseek' = 'ollama',
 ): Promise<string> => {
   try {
     const prompt = `Classify the keyword into one of these topics: ${VALID_TOPICS.join(

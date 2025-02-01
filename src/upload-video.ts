@@ -91,7 +91,9 @@ async function _scheduleUploadVideoByType(
   }
 }
 async function scheduleToUpload() {
-  const channels = await Channel.find({}).exec();
+  const channels = await Channel.find({
+    isActive: true,
+  }).exec();
 
   for (const channel of channels) {
     await _scheduleUploadVideoByType(channel, 'short');
@@ -116,7 +118,7 @@ async function uploadVideoCronJob() {
         }
 
         const channel = await Channel.findById(upload.channelId);
-        if (!channel) {
+        if (!channel || !channel.isActive) {
           continue;
         }
 
