@@ -59,7 +59,10 @@ async function generateVideos() {
       await Keyword.updateOne(
         { _id: keyword._id },
         {
-          $set: { isLongGenerated: true, 'video.taskId': videoTaskRes.task_id },
+          $set: {
+            isLongGenerated: true,
+            video: { taskId: videoTaskRes.task_id },
+          },
         },
       );
 
@@ -147,7 +150,7 @@ async function generateShortVideos() {
         {
           $set: {
             isShortGenerated: true,
-            'shortVideo.taskId': videoTaskRes.task_id,
+            shortVideo: { taskId: videoTaskRes.task_id },
           },
         },
       );
