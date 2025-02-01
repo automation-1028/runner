@@ -2,6 +2,7 @@ import ollama from 'ollama';
 
 import { openai } from '../configs/openai';
 import { extractContent } from '../utils/deepseek.util';
+import { deepseek } from '../configs/deepseek';
 
 const VALID_TOPICS = [
   'travel',
@@ -20,7 +21,7 @@ const VALID_TOPICS = [
 
 const classifyKeyword = async (
   keyword: string,
-  provider: 'openai' | 'ollama' = 'ollama',
+  provider: 'openai' | 'ollama' | 'deepseek' = 'deepseek',
 ): Promise<string> => {
   try {
     const prompt = `Classify the keyword into one of these topics: ${VALID_TOPICS.join(
@@ -39,6 +40,16 @@ const classifyKeyword = async (
       });
 
       result = extractContent(response.message.content).toLowerCase();
+    } else if (provider === 'deepseek') {
+      const response = await deepseek.chat.completions.create({
+        model: process.env.DEEPSEEK_MODEL || 'deepseek/deepseek-r1',
+        messages: [
+          { role: 'system', content: prompt },
+          { role: 'user', content: keyword },
+        ],
+      });
+
+      result = response.choices[0].message.content?.trim().toLowerCase();
     } else {
       const response = await openai.chat.completions.create({
         model: 'gpt-4',

@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "dev": "dotenv -e .env -- ts-node-dev --transpile-only ./src/main.ts",
-    "test": "dotenv -e .env -- ts-node-dev --transpile-only ./src/utils/similarity.util.ts",
+    "test": "npx jest",
     "build": "tsup --config build.ts",
     "start": "dotenv -e .env -- node ./dist/main.js",
     "lint": "eslint",
