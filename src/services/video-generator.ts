@@ -37,6 +37,7 @@ export interface VideoRequestPayload {
 export const DEFAULT_VIDEO_INFO = {
   video_aspect: '16:9',
   video_concat_mode: 'random',
+  video_transition_mode: 'None',
   video_clip_duration: 10,
   video_count: 1,
   video_source: 'pexels',
