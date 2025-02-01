@@ -14,6 +14,7 @@ import { IScript, Keyword, KeywordDocument } from './models/keyword';
 
 async function generateVideos() {
   const genVideo = async (keyword: KeywordDocument) => {
+    console.log(keyword);
     const script = keyword.script as IScript;
     try {
       console.log(
