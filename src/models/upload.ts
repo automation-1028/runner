@@ -26,6 +26,11 @@ const UploadSchema = new Schema<UploadDocument>(
       ref: 'keyword',
       required: true,
     },
+    visibility: {
+      type: String,
+      enum: ['public', 'private', 'unlisted'],
+      required: true,
+    },
     videoType: {
       type: String,
       enum: ['short', 'long'],

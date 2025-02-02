@@ -122,6 +122,12 @@ async function uploadVideoCronJob() {
           continue;
         }
 
+        console.log(
+          `${chalk.green(
+            '[uploadVideoCronJob]',
+          )} Uploading video for channel: ${chalk.magenta(channel.name)}`,
+        );
+
         const script = keyword.script as IScript;
         const { title, description, thumbnail, tags } = script;
         const video = (
@@ -143,6 +149,12 @@ async function uploadVideoCronJob() {
         await Upload.findByIdAndUpdate(upload._id, {
           visibility: 'public',
         });
+
+        console.log(
+          `${chalk.green(
+            '[uploadVideoCronJob]',
+          )} Uploaded video for channel: ${chalk.magenta(channel.name)}`,
+        );
       }
     } catch (error) {
       console.error(
