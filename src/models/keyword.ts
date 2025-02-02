@@ -17,9 +17,9 @@ export interface IVideo {
 
 export interface IKeyword {
   keyword: string;
-  competition: number;
-  volume: number;
-  overall: number;
+  competition?: number;
+  volume?: number;
+  overall?: number;
   estimatedMonthlySearch: number;
   topic: string;
   isGeneratedScript: boolean;
@@ -39,9 +39,9 @@ export interface KeywordDocument extends IKeyword, Document {}
 const KeywordSchema = new Schema<KeywordDocument>(
   {
     keyword: { type: String, required: true },
-    competition: { type: Number, required: true },
-    volume: { type: Number, required: true },
-    overall: { type: Number, required: true },
+    competition: { type: Number },
+    volume: { type: Number },
+    overall: { type: Number },
     estimatedMonthlySearch: { type: Number, required: true },
     topic: {
       type: String,
