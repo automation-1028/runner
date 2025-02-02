@@ -110,12 +110,6 @@ async function uploadVideoCronJob() {
         },
         visibility: 'unlisted',
       });
-      console.log(1, {
-        publishAt: {
-          $lte: new Date(),
-        },
-        visibility: 'unlisted',
-      });
       console.log(
         `${chalk.green('[uploadVideoCronJob]')} Found ${
           uploads.length
