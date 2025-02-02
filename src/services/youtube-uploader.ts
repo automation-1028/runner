@@ -14,6 +14,6 @@ export interface UploadVideoRequest {
 }
 
 export const uploadVideo = async (payload: UploadVideoRequest) => {
-  const response = await instance.post('/upload-video', payload);
+  const response = await instance.post('/upload-video-v2', payload);
   return response.data;
 };
