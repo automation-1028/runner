@@ -42,8 +42,6 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
       thumbnail: videoScript.thumbnail,
       tags: videoScript.tags,
       keyword,
-      isShortGenerated: false,
-      isLongGenerated: false,
     };
     await keywordDB.save();
 
