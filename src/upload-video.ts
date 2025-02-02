@@ -110,6 +110,11 @@ async function uploadVideoCronJob() {
         },
         visibility: 'unlisted',
       });
+      console.log(
+        `${chalk.green('[uploadVideoCronJob]')} Found ${
+          uploads.length
+        } videos to upload`,
+      );
 
       for (const upload of uploads) {
         const keyword = await Keyword.findById(upload.keywordId);
