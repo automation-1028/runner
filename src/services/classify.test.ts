@@ -7,7 +7,7 @@ describe('Classify keyword', () => {
     async () => {
       const topic = await classifyKeyword('Why Chinese Food Is So Fast');
 
-      expect(topic).toEqual('food');
+      expect(topic).toContain('food');
     },
     60_000 * 5,
   );
@@ -57,7 +57,7 @@ describe('Classify keyword', () => {
     async () => {
       const topic = await classifyKeyword('How to help yourself');
 
-      expect(topic).toEqual('selfhelp');
+      expect(topic).toEqual('self-help');
     },
     60_000 * 5,
   );
@@ -70,6 +70,17 @@ describe('Classify keyword', () => {
       );
 
       expect(topic).not.toEqual('travel');
+    },
+    60_000 * 5,
+  );
+
+  it(
+    'should return not food topic',
+    async () => {
+      const topic = await classifyKeyword('how does pregnancy test work gcse');
+
+      console.log(1, topic);
+      expect(topic).not.toEqual('food');
     },
     60_000 * 5,
   );

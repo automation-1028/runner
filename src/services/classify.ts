@@ -23,9 +23,7 @@ const classifyKeyword = async (
   provider: 'openai' | 'ollama' | 'deepseek' = 'deepseek',
 ): Promise<string> => {
   try {
-    const prompt = `You are analyzing YouTube video titles. For the given video title, classify it into one of these topics: ${VALID_TOPICS.join(
-      ', ',
-    )}. Consider the main theme and content of the video based on its title. If it doesn't match any topic exactly, select the closest matching topic or provide a specific single-word topic name. Respond with only the topic name, nothing else.`;
+    const prompt = `You are analyzing YouTube video titles. For the given video title, classify it into a single, specific topic category that best represents its main theme and content. Respond with only the topic name in lowercase, nothing else. The topic should be a single word or short phrase that clearly categorizes the content.`;
 
     let result: string | undefined;
 
