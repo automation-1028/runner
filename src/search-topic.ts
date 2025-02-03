@@ -208,6 +208,8 @@ async function setPriorityKeywords() {
           },
         },
       );
+
+      await sleep(1_000); // Rate limiting
     }
   }
 }
