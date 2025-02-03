@@ -13,7 +13,6 @@ const VALID_TOPICS = [
   'mindfulness',
   'psychology',
   'leadership',
-  'selfhelp',
   'life experiences',
   'personal growth',
 ] as const;
