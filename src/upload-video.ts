@@ -22,7 +22,16 @@ async function _scheduleUploadVideoByType(
   );
 
   try {
+    // Get uploaded
+    const uploaded = await Upload.find({
+      channelId: channel._id,
+      videoType,
+      visibility: 'public',
+    });
+    const uploadedKeywordIds = uploaded.map((upload) => upload.keywordId);
+
     const keywords = await Keyword.find({
+      _id: { $nin: uploadedKeywordIds },
       topic: { $in: topics },
       isGeneratedScript: true,
 
