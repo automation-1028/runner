@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { classifyKeyword } from './classify';
 
-describe('Classify', () => {
+describe('Classify keyword', () => {
   it(
     'should return valid food topic',
     async () => {
