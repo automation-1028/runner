@@ -65,6 +65,7 @@ async function searchKeyword() {
 
   while (true) {
     let topics = topicManager.getTopics();
+    topics = _.uniq(topics);
     topics = _.sampleSize(topics, topics.length);
 
     if (topics.length === 0) {
