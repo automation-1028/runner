@@ -19,7 +19,7 @@ const priotizeTopics = [
   'mindfulness',
   'psychology',
   'leadership',
-  'selfhelp',
+  // 'selfhelp',
   'life experiences',
   'personal growth',
 ];
