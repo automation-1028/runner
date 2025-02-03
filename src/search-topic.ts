@@ -97,83 +97,81 @@ async function searchKeyword() {
       topicManager.updateTopics(topics);
 
       // Process keywords in batches
-      for (let i = 0; i < relatedKeywords.length; i++) {
-        await Promise.map(
-          relatedKeywords,
-          async (keyword) => {
-            try {
-              const questions = await getQuestions(keyword);
-              await Promise.map(
-                questions,
-                async (question) => {
-                  const {
-                    keyword: questionKeyword,
+      await Promise.map(
+        relatedKeywords,
+        async (keyword) => {
+          try {
+            const questions = await getQuestions(keyword);
+            await Promise.map(
+              questions,
+              async (question) => {
+                const {
+                  keyword: questionKeyword,
+                  competition,
+                  volume,
+                  overall,
+                  estimated_monthly_search,
+                } = question;
+
+                // Skip non-English keywords
+                if (!isEnglishWord(questionKeyword)) {
+                  console.log(
+                    `${chalk.yellow(
+                      `[searchKeyword]`,
+                    )} Skipping non-English keyword: ${chalk.magenta(
+                      questionKeyword,
+                    )}`,
+                  );
+                  return;
+                }
+
+                const topic = await classifyKeyword(questionKeyword);
+                const priority = priotizeTopics.includes(topic) ? 1 : 0;
+
+                await Keyword.findOneAndUpdate(
+                  { keyword: questionKeyword },
+                  {
                     competition,
                     volume,
                     overall,
-                    estimated_monthly_search,
-                  } = question;
+                    estimatedMonthlySearch: estimated_monthly_search,
+                    topic,
+                    priority,
+                  },
+                  { upsert: true },
+                );
 
-                  // Skip non-English keywords
-                  if (!isEnglishWord(questionKeyword)) {
-                    console.log(
-                      `${chalk.yellow(
-                        `[searchKeyword]`,
-                      )} Skipping non-English keyword: ${chalk.magenta(
-                        questionKeyword,
-                      )}`,
-                    );
-                    return;
-                  }
+                console.log(
+                  `${chalk.green(
+                    `[searchKeyword]`,
+                  )} Processed keyword: ${chalk.magenta(
+                    questionKeyword,
+                  )} under topic: ${chalk.magenta(topic)}`,
+                );
 
-                  const topic = await classifyKeyword(questionKeyword);
-                  const priority = priotizeTopics.includes(topic) ? 1 : 0;
+                await sleep(1_000); // Rate limiting
+              },
+              {
+                concurrency: 1,
+              },
+            );
 
-                  await Keyword.findOneAndUpdate(
-                    { keyword: questionKeyword },
-                    {
-                      competition,
-                      volume,
-                      overall,
-                      estimatedMonthlySearch: estimated_monthly_search,
-                      topic,
-                      priority,
-                    },
-                    { upsert: true },
-                  );
-
-                  console.log(
-                    `${chalk.green(
-                      `[searchKeyword]`,
-                    )} Processed keyword: ${chalk.magenta(
-                      questionKeyword,
-                    )} under topic: ${chalk.magenta(topic)}`,
-                  );
-
-                  await sleep(1_000); // Rate limiting
-                },
-                {
-                  concurrency: 1,
-                },
-              );
-
-              topicManager.removeTopic(keyword);
-            } catch (error) {
-              console.error(
-                `${chalk.red(
-                  `[searchKeyword]`,
-                )} Failed to process keyword ${keyword}: ${
-                  (error as Error).message
-                }`,
-              );
-              await sleep(60_000);
-            }
-          },
-          {
-            concurrency: 1,
-          },
-        );
-      }
+            topicManager.removeTopic(keyword);
+          } catch (error) {
+            console.error(
+              `${chalk.red(
+                `[searchKeyword]`,
+              )} Failed to process keyword ${keyword}: ${
+                (error as Error).message
+              }`,
+            );
+            await sleep(60_000);
+          }
+        },
+        {
+          concurrency: 2,
+        },
+      );
     } catch (error) {
       console.error(
         `${chalk.red(
