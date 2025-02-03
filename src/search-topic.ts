@@ -155,6 +155,8 @@ async function searchKeyword() {
                   concurrency: 2,
                 },
               );
+
+              topicManager.removeTopic(keyword);
             } catch (error) {
               console.error(
                 `[searchKeyword] Failed to process keyword ${keyword}: ${
@@ -162,8 +164,6 @@ async function searchKeyword() {
                 }`,
               );
               await sleep(60_000);
-            } finally {
-              topicManager.removeTopic(keyword);
             }
           },
           {
