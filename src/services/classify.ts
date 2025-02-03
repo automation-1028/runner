@@ -20,21 +20,23 @@ const VALID_TOPICS = [
 
 const classifyKeyword = async (
   keyword: string,
-  provider: 'openai' | 'ollama' | 'deepseek' = 'ollama',
+  provider: 'openai' | 'ollama' | 'deepseek' = 'deepseek',
 ): Promise<string> => {
   try {
-    const prompt = `Classify the keyword into one of these topics: ${VALID_TOPICS.join(
+    const prompt = `You are analyzing YouTube video titles. For the given video title, classify it into one of these topics: ${VALID_TOPICS.join(
       ', ',
-    )}. If it doesn't match any topic, provide a specific single-word topic name. Respond with only the topic name, nothing else.`;
+    )}. Consider the main theme and content of the video based on its title. If it doesn't match any topic exactly, select the closest matching topic or provide a specific single-word topic name. Respond with only the topic name, nothing else.`;
 
     let result: string | undefined;
+
+    const userPrompt = `Title: ${keyword}`;
 
     if (provider === 'ollama') {
       const response = await ollama.chat.completions.create({
         model: 'deepseek-r1:7b',
         messages: [
           { role: 'system', content: prompt },
-          { role: 'user', content: keyword },
+          { role: 'user', content: userPrompt },
         ],
       });
 
@@ -43,10 +45,11 @@ const classifyKeyword = async (
       ).toLowerCase();
     } else if (provider === 'deepseek') {
       const response = await deepseek.chat.completions.create({
-        model: process.env.DEEPSEEK_MODEL || 'deepseek/deepseek-r1',
+        model:
+          process.env.DEEPSEEK_MODEL || 'deepseek/deepseek-r1-distill-qwen-32b',
         messages: [
           { role: 'system', content: prompt },
-          { role: 'user', content: keyword },
+          { role: 'user', content: userPrompt },
         ],
       });
 
@@ -56,7 +59,7 @@ const classifyKeyword = async (
         model: 'gpt-4',
         messages: [
           { role: 'system', content: prompt },
-          { role: 'user', content: keyword },
+          { role: 'user', content: userPrompt },
         ],
         temperature: 0.3,
         max_tokens: 20,
