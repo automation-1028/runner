@@ -69,8 +69,6 @@ describe('Classify keyword', () => {
         'when calls the heart 8x08 tvpromosdb',
       );
 
-      console.log(1, topic);
-
       expect(topic).not.toEqual('travel');
     },
     60_000 * 5,
