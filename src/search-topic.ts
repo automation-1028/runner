@@ -51,6 +51,11 @@ class TopicManager {
       console.error(`Failed to write topics: ${(error as Error).message}`);
     }
   }
+
+  removeTopic(topic: string): void {
+    const topics = this.getTopics().filter((t) => t !== topic);
+    this.updateTopics(topics);
+  }
 }
 
 async function searchKeyword() {
@@ -60,6 +65,8 @@ async function searchKeyword() {
 
   while (true) {
     let topics = topicManager.getTopics();
+    topics = _.sampleSize(topics, topics.length);
+
     if (topics.length === 0) {
       console.log(
         `${chalk.green(`[searchKeyword]`)} No topics to process. Waiting...`,
@@ -82,7 +89,7 @@ async function searchKeyword() {
 
       // Update topics list
       topics = topics.filter((t) => t !== currentTopic);
-      if (currentTopic.length < 3000) {
+      if (currentTopic.length < 10_000) {
         topics.push(...relatedKeywords);
       }
       topicManager.updateTopics(topics);
@@ -154,6 +161,8 @@ async function searchKeyword() {
                 }`,
               );
               await sleep(60_000);
+            } finally {
+              topicManager.removeTopic(keyword);
             }
           },
           {
