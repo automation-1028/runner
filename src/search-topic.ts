@@ -5,10 +5,14 @@ import { Promise } from 'bluebird';
 import _ from 'lodash';
 
 import { classifyKeyword } from './services/classify';
-import { Keyword } from './models/keyword';
+import { Keyword, KeywordDocument } from './models/keyword';
 import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
+import {
+  getSentenceSimilarity,
+  getWordSimilarity,
+} from './utils/similarity.util';
 
 const priotizeTopics = [
   'travel',
@@ -184,19 +188,19 @@ async function searchKeyword() {
 
 async function setPriorityKeywords() {
   while (true) {
-    const keywords = await Keyword.aggregate([
-      { $match: { $sampleRate: 0.33, priority: { $ne: 1 } } },
-    ]);
-    for (const keyword of keywords) {
-      const priority = priotizeTopics.includes(keyword.topic) ? 1 : 0;
+    const keywords: KeywordDocument[] = await Keyword.find({})
+      .sort({ updatedAt: 1 })
+      .limit(1000);
 
-      console.log(
-        `${chalk.green(
-          `[setPriorityKeywords]`,
-        )} Setting priority for keyword: ${chalk.magenta(
-          keyword.keyword,
-        )} to ${chalk.magenta(priority.toString())}`,
-      );
+    for (const keyword of keywords) {
+      const priority = calculatePriority(keyword.topic);
+      // console.log(
+      //   `${chalk.green(
+      //     `[setPriorityKeywords]`,
+      //   )} Setting priority for keyword: ${chalk.magenta(
+      //     keyword.topic,
+      //   )} to ${chalk.magenta(priority.toString())}`,
+      // );
       await Keyword.updateOne(
         { _id: keyword._id },
         {
@@ -209,21 +213,20 @@ async function setPriorityKeywords() {
   }
 }
 
-// function calculatePriority(comparedTopic: string): number {
-//   let isVerySimilar = false;
-//   let isSimilar = false;
+function calculatePriority(comparedTopic: string): number {
+  let isVerySimilar = false;
+  let isSimilar = false;
 
-//   priotizeTopics.forEach((topic) => tfidf.addDocument(topic));
-//   tfidf.tfidfs(comparedTopic, (_, measure, key) => {
-//     console.log(2, key, measure);
-//   });
+  isVerySimilar = priotizeTopics.some(
+    (topic) => getWordSimilarity(comparedTopic, topic) >= 0.7,
+  );
+  isSimilar =
+    !isVerySimilar &&
+    priotizeTopics.some(
+      (topic) => getWordSimilarity(comparedTopic, topic) >= 0.4,
+    );
 
-//   for (const topic of priotizeTopics) {
-//     isVerySimilar = getSentenceSimilarity(comparedTopic, topic) > 0.7;
-//     isSimilar = getSentenceSimilarity(comparedTopic, topic) > 0.5;
-//   }
-
-//   return isVerySimilar ? 1 : isSimilar ? 0.5 : 0;
-// }
+  return isVerySimilar ? 1 : isSimilar ? 0.5 : 0;
+}
 
 export { searchKeyword, setPriorityKeywords };
