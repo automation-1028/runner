@@ -8,9 +8,9 @@ import { generateShortVideos, generateVideos } from './generate-video';
 
 searchKeyword();
 
-generateScripts();
-generateVideos();
-generateShortVideos();
+// generateScripts();
+// generateVideos();
+// generateShortVideos();
 
-scheduleToUpload();
-uploadVideoCronJob();
+// scheduleToUpload();
+// uploadVideoCronJob();
