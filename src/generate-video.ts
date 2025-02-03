@@ -22,7 +22,7 @@ async function generateVideos() {
         )} Generating video with ${chalk.magenta(script.keyword)} keyword...`,
       );
 
-      const tagNum = script.tags.split(',').length;
+      const tagNum = (script.tags || '').split(',').length;
       const videoTaskRes = await generateVideo({
         ...DEFAULT_VIDEO_INFO,
         ...{
@@ -112,7 +112,7 @@ async function generateShortVideos() {
         )} keyword...`,
       );
 
-      const tagNum = script.tags.split(',').length;
+      const tagNum = (script.tags || '').split(',').length;
       const videoTaskRes = await generateVideo({
         ...DEFAULT_VIDEO_INFO,
         ...{
