@@ -84,6 +84,7 @@ async function generateVideos() {
 
   while (true) {
     const keywords = await Keyword.find({
+      isGeneratedScript: true,
       isLongGenerated: false,
     }).sort({ priority: -1 });
 
@@ -183,6 +184,7 @@ async function generateShortVideos() {
 
   while (true) {
     const keywords = await Keyword.find({
+      isGeneratedScript: true,
       isShortGenerated: false,
     }).sort({ priority: -1 });
 
