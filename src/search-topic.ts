@@ -9,10 +9,7 @@ import { Keyword, KeywordDocument } from './models/keyword';
 import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
-import {
-  getSentenceSimilarity,
-  getWordSimilarity,
-} from './utils/similarity.util';
+import { getWordSimilarity } from './utils/similarity.util';
 
 const priotizeTopics = [
   'travel',
@@ -214,19 +211,14 @@ async function setPriorityKeywords() {
 }
 
 function calculatePriority(comparedTopic: string): number {
-  let isVerySimilar = false;
-  let isSimilar = false;
-
-  isVerySimilar = priotizeTopics.some(
-    (topic) => getWordSimilarity(comparedTopic, topic) >= 0.7,
+  const maxSimilarity = Math.max(
+    ...priotizeTopics.map((topic) => getWordSimilarity(comparedTopic, topic)),
   );
-  isSimilar =
-    !isVerySimilar &&
-    priotizeTopics.some(
-      (topic) => getWordSimilarity(comparedTopic, topic) >= 0.4,
-    );
 
-  return isVerySimilar ? 1 : isSimilar ? 0.5 : 0;
+  if (maxSimilarity >= 1) return 1;
+  if (maxSimilarity >= 0.7) return 1;
+  if (maxSimilarity >= 0.4) return 0.5;
+  return 0;
 }
 
 export { searchKeyword, setPriorityKeywords };
