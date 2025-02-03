@@ -143,7 +143,7 @@ async function uploadVideoCronJob() {
         );
 
         const script = keyword.script as IScript;
-        const { title, description, thumbnail, tags } = script;
+        const { title, description, thumbnail, tags = '' } = script;
         const video = (
           upload.videoType === 'short' ? keyword.shortVideo : keyword.longVideo
         ) as IVideo;
