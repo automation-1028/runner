@@ -84,7 +84,7 @@ async function generateVideos() {
 
   while (true) {
     const keywords = await Keyword.find({
-      isLongGenerated: true,
+      isLongGenerated: false,
     }).sort({ priority: -1 });
 
     if (_.isEmpty(keywords)) {
@@ -183,7 +183,7 @@ async function generateShortVideos() {
 
   while (true) {
     const keywords = await Keyword.find({
-      isShortGenerated: true,
+      isShortGenerated: false,
     }).sort({ priority: -1 });
 
     if (_.isEmpty(keywords)) {
