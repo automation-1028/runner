@@ -160,7 +160,9 @@ async function searchKeyword() {
               topicManager.removeTopic(keyword);
             } catch (error) {
               console.error(
-                `[searchKeyword] Failed to process keyword ${keyword}: ${
+                `${chalk.red(
+                  `[searchKeyword]`,
+                )} Failed to process keyword ${keyword}: ${
                   (error as Error).message
                 }`,
               );
@@ -174,7 +176,9 @@ async function searchKeyword() {
       }
     } catch (error) {
       console.error(
-        `[searchKeyword] Failed to process topic ${currentTopic}: ${
+        `${chalk.red(
+          `[searchKeyword]`,
+        )} Failed to process topic ${currentTopic}: ${
           (error as Error).message
         }`,
       );
