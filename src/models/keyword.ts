@@ -4,7 +4,7 @@ interface IScriptBase {
   title: string;
   description: string;
   thumbnail: string;
-  tags: string;
+  tags?: string;
 }
 
 export interface IScript extends IScriptBase {
@@ -53,7 +53,7 @@ const KeywordSchema = new Schema<KeywordDocument>(
         title: { type: String, required: true },
         description: { type: String, required: true },
         thumbnail: { type: String, required: true },
-        tags: { type: String, required: true },
+        tags: { type: String },
         keyword: { type: String, required: true },
       },
     },
