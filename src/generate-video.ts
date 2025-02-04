@@ -62,7 +62,7 @@ async function generateVideos() {
         {
           $set: {
             isLongGenerated: true,
-            video: { taskId: videoTaskRes.task_id },
+            longVideo: { taskId: videoTaskRes.task_id },
           },
         },
       );

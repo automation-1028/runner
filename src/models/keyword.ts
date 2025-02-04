@@ -24,7 +24,6 @@ export interface IKeyword {
   topic: string;
   isGeneratedScript: boolean;
   script?: IScript;
-  video: IVideo;
   isShortGenerated: boolean;
   isLongGenerated: boolean;
   shortVideo?: IVideo;
