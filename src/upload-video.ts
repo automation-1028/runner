@@ -151,6 +151,12 @@ async function uploadVideoCronJob() {
           upload.videoType === 'short' ? keyword.shortVideo : keyword.longVideo
         ) as IVideo;
 
+        console.log(
+          `${chalk.green('[uploadVideoCronJob]')} Uploading ${
+            upload.videoType
+          } video with keyword: ${chalk.magenta(keyword.keyword)}`,
+        );
+
         const videoTags = tags.substring(0, 480).split(',');
         videoTags.pop();
 
