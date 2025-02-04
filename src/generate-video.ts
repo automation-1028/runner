@@ -11,6 +11,7 @@ import {
 import { retry } from './utils/retry.util';
 import { sleep } from './utils/sleep.util';
 import { IScript, Keyword, KeywordDocument } from './models/keyword';
+import Sentry from './configs/sentry';
 
 async function generateVideos() {
   const genVideo = async (keyword: KeywordDocument) => {
@@ -72,6 +73,8 @@ async function generateVideos() {
         )} Generated video with ${chalk.magenta(script.keyword)} keyword!`,
       );
     } catch (error) {
+      Sentry.captureException(error);
+
       console.error(
         `${chalk.green(
           '[generateVideos]',
@@ -172,6 +175,8 @@ async function generateShortVideos() {
         )} keyword!`,
       );
     } catch (error) {
+      Sentry.captureException(error);
+
       console.error(
         `${chalk.green(
           '[generateShortVideos]',

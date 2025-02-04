@@ -5,6 +5,7 @@ import './configs/mongoose';
 import { generateScript } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { Keyword, KeywordDocument } from './models/keyword';
+import Sentry from './configs/sentry';
 
 async function generateScripts() {
   while (true) {
@@ -51,6 +52,8 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
       )} Generated script with ${chalk.magenta(keyword)} keyword!`,
     );
   } catch (error) {
+    Sentry.captureException(error);
+
     console.error(
       `${chalk.green(
         '[generateScripts]',

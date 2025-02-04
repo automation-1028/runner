@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Sentry from '../configs/sentry';
 
 const instance = axios.create({
   baseURL: 'http://127.0.0.1:8080/api/v1',
@@ -67,6 +68,8 @@ export const generateVideo = async (videoInfo: VideoRequestPayload) => {
     const response = await instance.post('/videos', videoInfo);
     return response.data.data;
   } catch (error) {
+    Sentry.captureException(error);
+
     console.error(error);
   }
 };
@@ -76,6 +79,8 @@ export const getTask = async (taskId: string) => {
     const response = await instance.get(`/tasks/${taskId}`);
     return response.data.data;
   } catch (error) {
+    Sentry.captureException(error);
+
     console.error(error);
   }
 };

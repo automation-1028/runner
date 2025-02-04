@@ -7,6 +7,7 @@ import { sleep } from './utils/sleep.util';
 import { Channel, ChannelDocument } from './models/channel';
 import { IScript, IVideo, Keyword } from './models/keyword';
 import { Upload } from './models/upload';
+import Sentry from './configs/sentry';
 
 async function _scheduleUploadVideoByType(
   channel: ChannelDocument,
@@ -87,6 +88,8 @@ async function _scheduleUploadVideoByType(
       );
     }
   } catch (error) {
+    Sentry.captureException(error);
+
     console.error(
       `${chalk.red(
         '[scheduleToUpload]',
@@ -171,6 +174,8 @@ async function uploadVideoCronJob() {
         );
       }
     } catch (error) {
+      Sentry.captureException(error);
+
       console.error(
         `${chalk.red('[uploadVideoCronJob]')} Error uploading video`,
         error,

@@ -10,6 +10,7 @@ import { getRelatedKeywords, getQuestions } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
 import { getWordSimilarity } from './utils/similarity.util';
+import Sentry from './configs/sentry';
 
 const priotizeTopics = [
   'travel',
@@ -40,6 +41,8 @@ class TopicManager {
         .map((k) => k.trim())
         .filter((k) => !!k);
     } catch (error) {
+      Sentry.captureException(error);
+
       console.error(`Failed to read topics: ${(error as Error).message}`);
       return [];
     }
@@ -49,6 +52,8 @@ class TopicManager {
     try {
       fs.writeFileSync(this.topicPath, topics.join('\n'));
     } catch (error) {
+      Sentry.captureException(error);
+
       console.error(`Failed to write topics: ${(error as Error).message}`);
     }
   }
@@ -158,6 +163,8 @@ async function searchKeyword() {
 
             topicManager.removeTopic(keyword);
           } catch (error) {
+            Sentry.captureException(error);
+
             console.error(
               `${chalk.red(
                 `[searchKeyword]`,
@@ -173,6 +180,8 @@ async function searchKeyword() {
         },
       );
     } catch (error) {
+      Sentry.captureException(error);
+
       console.error(
         `${chalk.red(
           `[searchKeyword]`,

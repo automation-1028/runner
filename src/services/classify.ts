@@ -2,6 +2,7 @@ import { openai } from '../configs/openai';
 import { extractContent } from '../utils/deepseek.util';
 import { deepseek } from '../configs/deepseek';
 import { ollama } from '../configs/ollama';
+import Sentry from '../configs/sentry';
 
 const VALID_TOPICS = [
   'travel',
@@ -70,6 +71,8 @@ const classifyKeyword = async (
 
     return result;
   } catch (error) {
+    Sentry.captureException(error);
+
     console.error('Classification error:', error);
     throw new Error('Failed to classify keyword');
   }
