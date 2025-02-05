@@ -27,7 +27,6 @@ async function _scheduleUploadVideoByType(
     const uploaded = await Upload.find({
       channelId: channel._id,
       videoType,
-      visibility: 'public',
     });
     const uploadedKeywordIds = uploaded.map((upload) => upload.keywordId);
 
