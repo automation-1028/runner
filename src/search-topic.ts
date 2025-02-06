@@ -201,7 +201,7 @@ async function setPriorityKeywords() {
       .limit(1000);
 
     for (const keyword of keywords) {
-      const priority = calculatePriority(keyword.topic);
+      const [priority, topic] = calculatePriority(keyword.topic);
       // console.log(
       //   `${chalk.green(
       //     `[setPriorityKeywords]`,
@@ -209,11 +209,13 @@ async function setPriorityKeywords() {
       //     keyword.topic,
       //   )} to ${chalk.magenta(priority.toString())}`,
       // );
+
       await Keyword.updateOne(
         { _id: keyword._id },
         {
           $set: {
             priority,
+            secondTopic: topic,
           },
         },
       );
@@ -223,15 +225,20 @@ async function setPriorityKeywords() {
   }
 }
 
-function calculatePriority(comparedTopic: string): number {
-  const maxSimilarity = Math.max(
-    ...priotizeTopics.map((topic) => getWordSimilarity(comparedTopic, topic)),
-  );
+function calculatePriority(comparedTopic: string): [number, string] {
+  const priorityTopics = priotizeTopics.map((topic) => [
+    getWordSimilarity(comparedTopic, topic),
+    topic,
+  ]);
+  const [maxSimilarity, topic] = _.maxBy(
+    priorityTopics,
+    ([similarity]) => similarity,
+  ) as [number, string];
 
-  if (maxSimilarity >= 1) return 1;
-  if (maxSimilarity >= 0.7) return 1;
-  if (maxSimilarity >= 0.4) return 0.5;
-  return 0;
+  if (maxSimilarity >= 1) return [1, topic];
+  if (maxSimilarity >= 0.7) return [0.7, topic];
+  if (maxSimilarity >= 0.4) return [0.5, topic];
+  return [0, topic];
 }
 
 export { searchKeyword, setPriorityKeywords };

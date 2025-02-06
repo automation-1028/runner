@@ -22,6 +22,7 @@ export interface IKeyword {
   overall?: number;
   estimatedMonthlySearch: number;
   topic: string;
+  secondTopic?: string;
   isGeneratedScript: boolean;
   script?: IScript;
   isShortGenerated: boolean;
@@ -46,6 +47,7 @@ const KeywordSchema = new Schema<KeywordDocument>(
       type: String,
       required: true,
     },
+    secondTopic: { type: String },
     isGeneratedScript: { type: Boolean, default: false },
     script: {
       type: {

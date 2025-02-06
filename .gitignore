@@ -137,3 +137,5 @@ videos.json
 short-videos.json
 keywords.txt
 my-topic.txt
+# Sentry Config File
+.sentryclirc

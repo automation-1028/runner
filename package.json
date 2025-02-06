@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "dotenv -e .env -- ts-node-dev --transpile-only ./src/main.ts",
     "test": "npx jest",
-    "build": "tsup --config build.ts",
+    "build": "tsup --config build.ts && yarn sentry:sourcemaps",
     "start": "dotenv -e .env -- node ./dist/main.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "format": "pnpm dlx prettier --config .prettierrc 'src/**/*.ts' --write"
+    "format": "pnpm dlx prettier --config .prettierrc 'src/**/*.ts' --write",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org xander-lee --project runner ./dist && sentry-cli sourcemaps upload --org xander-lee --project runner ./dist"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
@@ -33,6 +34,7 @@
     "typescript-eslint": "^7.11.0"
   },
   "dependencies": {
+    "@sentry/cli": "^2.41.1",
     "@sentry/node": "^8.54.0",
     "axios": "^1.7.9",
     "bluebird": "^3.7.2",
