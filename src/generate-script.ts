@@ -40,10 +40,6 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
     try {
       videoScript = await generateScript(keyword);
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.log(1, error.response?.data);
-      }
-
       if (
         error instanceof AxiosError &&
         error.response?.data.error === 'ValueError'
