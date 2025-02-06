@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const instance = axios.create({
   baseURL: 'http://localhost:3000',
+  timeout: 60_000 * 5,
 });
 
 export interface UploadVideoRequest {
