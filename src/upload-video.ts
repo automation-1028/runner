@@ -177,6 +177,8 @@ async function uploadVideoCronJob() {
             '[uploadVideoCronJob]',
           )} Uploaded video for channel: ${chalk.magenta(channel.name)}`,
         );
+
+        await sleep(60_000);
       }
     } catch (error) {
       Sentry.captureException(error);
