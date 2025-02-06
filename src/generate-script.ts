@@ -6,6 +6,7 @@ import { generateScript } from './services/script-generator';
 import { sleep } from './utils/sleep.util';
 import { Keyword, KeywordDocument } from './models/keyword';
 import Sentry from './configs/sentry';
+import { AxiosError } from 'axios';
 
 async function generateScripts() {
   while (true) {
@@ -34,7 +35,25 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
         `[generateScripts]`,
       )} Generating script with ${chalk.magenta(keyword)} keyword...`,
     );
-    const videoScript = await generateScript(keyword);
+
+    let videoScript;
+    try {
+      videoScript = await generateScript(keyword);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.log(1, error.response?.data);
+      }
+
+      if (
+        error instanceof AxiosError &&
+        error.response?.data.error === 'ValueError'
+      ) {
+        await keywordDB.deleteOne();
+        return;
+      }
+
+      throw error;
+    }
 
     keywordDB.isGeneratedScript = true;
     keywordDB.script = {
