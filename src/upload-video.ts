@@ -32,7 +32,7 @@ async function _scheduleUploadVideoByType(
 
     const keywords = await Keyword.find({
       _id: { $nin: uploadedKeywordIds },
-      topic: { $in: topics },
+      $or: [{ topic: { $in: topics } }, { secondTopic: { $in: topics } }],
       isGeneratedScript: true,
 
       ...(videoType === 'short' && { isShortGenerated: true }),
