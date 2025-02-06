@@ -160,6 +160,7 @@ async function uploadVideoCronJob() {
         videoTags.pop();
 
         await uploadVideo({
+          videoType: upload.videoType,
           title,
           description,
           thumbnail: upload.videoType === 'short' ? '' : thumbnail,

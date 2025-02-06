@@ -11,6 +11,7 @@ export interface UploadVideoRequest {
   description: string;
   filePath: string;
   chromeProfileId: string;
+  videoType: 'short' | 'long';
 }
 
 export const uploadVideo = async (payload: UploadVideoRequest) => {
