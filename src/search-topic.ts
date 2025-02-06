@@ -238,7 +238,7 @@ function calculatePriority(comparedTopic: string): [number, string] {
   if (maxSimilarity >= 1) return [1, topic];
   if (maxSimilarity >= 0.7) return [0.7, topic];
   if (maxSimilarity >= 0.4) return [0.5, topic];
-  return [0, topic];
+  return [0, ''];
 }
 
 export { searchKeyword, setPriorityKeywords };
