@@ -14,4 +14,4 @@ generateVideos();
 generateShortVideos();
 
 scheduleToUpload();
-// uploadVideoCronJob();
+uploadVideoCronJob();
