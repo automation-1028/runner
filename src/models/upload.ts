@@ -7,6 +7,7 @@ export interface IUpload {
   keywordId: mongoose.Types.ObjectId | KeywordDocument;
   visibility: 'public' | 'private' | 'unlisted';
   videoType: 'short' | 'long';
+  youtubeLink?: string;
   publishAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -31,6 +32,7 @@ const UploadSchema = new Schema<UploadDocument>(
       enum: ['public', 'private', 'unlisted'],
       required: true,
     },
+    youtubeLink: { type: String },
     videoType: {
       type: String,
       enum: ['short', 'long'],

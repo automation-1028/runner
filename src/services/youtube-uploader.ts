@@ -15,7 +15,13 @@ export interface UploadVideoRequest {
   videoType: 'short' | 'long';
 }
 
-export const uploadVideo = async (payload: UploadVideoRequest) => {
+interface UploadVideoResponse {
+  youtubeLink: string;
+}
+
+export const uploadVideo = async (
+  payload: UploadVideoRequest,
+): Promise<UploadVideoResponse> => {
   const response = await instance.post('/upload-video-v2', payload);
   return response.data;
 };
