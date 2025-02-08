@@ -168,7 +168,6 @@ async function uploadVideoCronJob() {
           filePath: `${process.env.VIDEO_TASK_DIR}/${video.taskId}/final-1.mp4`,
           chromeProfileId: channel.chromeProfileId,
         });
-        console.log({ videoRes });
         const youtubeLink = videoRes.youtubeLink;
 
         await Upload.findByIdAndUpdate(upload._id, {
