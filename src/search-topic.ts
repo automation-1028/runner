@@ -176,7 +176,7 @@ async function searchKeyword() {
           }
         },
         {
-          concurrency: 2,
+          concurrency: 1,
         },
       );
     } catch (error) {
