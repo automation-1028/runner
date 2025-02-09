@@ -272,6 +272,7 @@ async function getAvaibilityNum(
 ) {
   const uploadNum = await Upload.countDocuments({
     channelId: channel._id,
+    videoType,
   });
 
   const shortVideoNum = await Keyword.countDocuments({
