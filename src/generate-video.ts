@@ -101,6 +101,13 @@ async function generateVideos() {
       );
 
       if (availabilityNum > 100) {
+        console.log(
+          `${chalk.green(
+            '[generateShortVideos]',
+          )} Skip generating long videos for channel ${chalk.magenta(
+            channel.name,
+          )}`,
+        );
         continue;
       }
 
@@ -223,6 +230,13 @@ async function generateShortVideos() {
       );
 
       if (availabilityNum > 100) {
+        console.log(
+          `${chalk.green(
+            '[generateShortVideos]',
+          )} Skip generating short video for channel ${chalk.magenta(
+            channel.name,
+          )}`,
+        );
         continue;
       }
 
