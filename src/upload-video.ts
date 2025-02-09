@@ -113,76 +113,77 @@ async function scheduleToUpload() {
 }
 
 async function uploadVideoCronJob() {
-  while (true) {
-    try {
-      const uploads = await Upload.find({
-        publishAt: {
-          $lte: new Date(),
-        },
-        visibility: 'unlisted',
-      });
+  const _uploadVideo = async (channel: ChannelDocument) => {
+    const uploads = await Upload.find({
+      publishAt: {
+        $lte: new Date(),
+      },
+      visibility: 'unlisted',
+      channelId: channel._id,
+    });
+    console.log(
+      `${chalk.green('[uploadVideoCronJob]')} Found ${
+        uploads.length
+      } videos to upload for channel: ${chalk.magenta(channel.name)}`,
+    );
+
+    for (const upload of uploads) {
+      const keyword = await Keyword.findById(upload.keywordId);
+      if (!keyword) {
+        continue;
+      }
+
+      const script = keyword.script as IScript;
+      const { title, description, thumbnail, tags = '' } = script;
+      const video = (
+        upload.videoType === 'short' ? keyword.shortVideo : keyword.longVideo
+      ) as IVideo;
+
       console.log(
-        `${chalk.green('[uploadVideoCronJob]')} Found ${
-          uploads.length
-        } videos to upload`,
+        `${chalk.green('[uploadVideoCronJob]')} Uploading ${
+          upload.videoType
+        } video with keyword: ${chalk.magenta(keyword.keyword)}`,
       );
 
-      for (const upload of uploads) {
-        const keyword = await Keyword.findById(upload.keywordId);
-        if (!keyword) {
-          continue;
-        }
+      const videoTags = tags.substring(0, 480).split(',');
+      videoTags.pop();
 
-        const channel = await Channel.findById(upload.channelId);
-        if (!channel || !channel.isActive) {
-          continue;
-        }
+      const videoRes = await uploadVideo({
+        videoType: upload.videoType,
+        title,
+        description,
+        thumbnail: upload.videoType === 'short' ? '' : thumbnail,
+        tags: videoTags.slice(0, 15).join(', '),
+        filePath: `${process.env.VIDEO_TASK_DIR}/${video.taskId}/final-1.mp4`,
+        chromeProfileId: channel.chromeProfileId,
+      });
+      const youtubeLink = videoRes.youtubeLink;
 
-        console.log(
-          `${chalk.green(
-            '[uploadVideoCronJob]',
-          )} Uploading video for channel: ${chalk.magenta(channel.name)}`,
-        );
+      await Upload.findByIdAndUpdate(upload._id, {
+        visibility: 'public',
+        youtubeLink,
+      });
 
-        const script = keyword.script as IScript;
-        const { title, description, thumbnail, tags = '' } = script;
-        const video = (
-          upload.videoType === 'short' ? keyword.shortVideo : keyword.longVideo
-        ) as IVideo;
+      console.log(
+        `${chalk.green(
+          '[uploadVideoCronJob]',
+        )} Uploaded video for channel: ${chalk.magenta(channel.name)}`,
+      );
 
-        console.log(
-          `${chalk.green('[uploadVideoCronJob]')} Uploading ${
-            upload.videoType
-          } video with keyword: ${chalk.magenta(keyword.keyword)}`,
-        );
+      await sleep(60_000);
+    }
+  };
+  while (true) {
+    try {
+      const channels = await Channel.find({
+        isActive: true,
+      }).exec();
 
-        const videoTags = tags.substring(0, 480).split(',');
-        videoTags.pop();
-
-        const videoRes = await uploadVideo({
-          videoType: upload.videoType,
-          title,
-          description,
-          thumbnail: upload.videoType === 'short' ? '' : thumbnail,
-          tags: videoTags.slice(0, 15).join(', '),
-          filePath: `${process.env.VIDEO_TASK_DIR}/${video.taskId}/final-1.mp4`,
-          chromeProfileId: channel.chromeProfileId,
-        });
-        const youtubeLink = videoRes.youtubeLink;
-
-        await Upload.findByIdAndUpdate(upload._id, {
-          visibility: 'public',
-          youtubeLink,
-        });
-
-        console.log(
-          `${chalk.green(
-            '[uploadVideoCronJob]',
-          )} Uploaded video for channel: ${chalk.magenta(channel.name)}`,
-        );
-
-        await sleep(60_000);
-      }
+      await Promise.all(
+        channels.map(async (channel) => {
+          await _uploadVideo(channel);
+        }),
+      );
     } catch (error) {
       Sentry.captureException(error);
 
