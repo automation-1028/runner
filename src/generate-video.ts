@@ -11,6 +11,9 @@ import {
 import { retry } from './utils/retry.util';
 import { sleep } from './utils/sleep.util';
 import { IScript, Keyword, KeywordDocument } from './models/keyword';
+import { Channel, ChannelDocument } from './models/channel';
+import { Upload } from './models/upload';
+
 import Sentry from './configs/sentry';
 
 async function generateVideos() {
@@ -86,18 +89,36 @@ async function generateVideos() {
   };
 
   while (true) {
-    const keywords = await Keyword.find({
-      isGeneratedScript: true,
-      isLongGenerated: false,
-    }).sort({ priority: -1 });
+    const channels = await Channel.find({});
+    for (const channel of channels) {
+      const availabilityNum = await getAvaibilityNum(channel, 'short');
+      console.log(
+        `${chalk.green(
+          '[generateShortVideos]',
+        )} Available long videos for channel ${chalk.magenta(
+          channel.name,
+        )} is ${chalk.yellow(availabilityNum)}`,
+      );
 
-    if (_.isEmpty(keywords)) {
+      if (availabilityNum > 100) {
+        continue;
+      }
+
+      const keywords = await Keyword.find({
+        isGeneratedScript: true,
+        isLongGenerated: false,
+      }).sort({ priority: -1 });
+
+      if (_.isEmpty(keywords)) {
+        await sleep(60_000);
+        continue;
+      }
+
+      await Promise.all([genVideo(keywords[0]), genVideo(keywords[1])]);
       await sleep(60_000);
-      continue;
     }
 
-    await Promise.all([genVideo(keywords[0]), genVideo(keywords[1])]);
-    await sleep(60_000);
+    await sleep(60_000 * 10);
   }
 }
 
@@ -185,22 +206,62 @@ async function generateShortVideos() {
   };
 
   while (true) {
-    const keywords = await Keyword.find({
-      isGeneratedScript: true,
-      isShortGenerated: false,
-    }).sort({ priority: -1 });
+    const channels = await Channel.find({});
+    for (const channel of channels) {
+      const availabilityNum = await getAvaibilityNum(channel, 'short');
+      console.log(
+        `${chalk.green(
+          '[generateShortVideos]',
+        )} Available short videos for channel ${chalk.magenta(
+          channel.name,
+        )} is ${chalk.yellow(availabilityNum)}`,
+      );
 
-    if (_.isEmpty(keywords)) {
+      if (availabilityNum > 100) {
+        continue;
+      }
+
+      const keywords = await Keyword.find({
+        isGeneratedScript: true,
+        isShortGenerated: false,
+      }).sort({ priority: -1 });
+
+      if (_.isEmpty(keywords)) {
+        await sleep(60_000);
+        continue;
+      }
+
+      await Promise.all([
+        genVideo(keywords[0]),
+        //  genVideo(keywords[1])
+      ]);
       await sleep(60_000);
-      continue;
     }
 
-    await Promise.all([
-      genVideo(keywords[0]),
-      //  genVideo(keywords[1])
-    ]);
-    await sleep(60_000);
+    await sleep(60_000 * 10);
   }
 }
 
+async function getAvaibilityNum(
+  channel: ChannelDocument,
+  videoType: 'short' | 'long',
+) {
+  const uploadNum = await Upload.countDocuments({
+    channelId: channel._id,
+  });
+
+  const shortVideoNum = await Keyword.countDocuments({
+    ...(videoType === 'short' ? { isShortGenerated: true } : {}),
+    ...(videoType === 'long' ? { isLongGenerated: true } : {}),
+
+    $or: [
+      { topic: { $in: channel.topics } },
+      { secondTopic: { $in: channel.topics } },
+    ],
+  });
+
+  const availabilityNum = shortVideoNum - uploadNum;
+
+  return availabilityNum;
+}
 export { generateVideos, generateShortVideos };
