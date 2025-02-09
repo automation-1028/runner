@@ -262,7 +262,7 @@ async function generateShortVideos() {
       await sleep(60_000);
     }
 
-    await sleep(60_000 * 10);
+    await sleep(60_000 * 3);
   }
 }
 
