@@ -92,7 +92,8 @@ async function searchKeyword() {
         )}`,
       );
 
-      const relatedKeywords = await getRelatedKeywords(currentTopic);
+      let relatedKeywords = await getRelatedKeywords(currentTopic);
+      relatedKeywords = relatedKeywords.filter((k) => isEnglishWord(k));
 
       // Update topics list
       topics = topics.filter((t) => t !== currentTopic);
