@@ -91,7 +91,7 @@ async function generateVideos() {
   while (true) {
     const channels = await Channel.find({});
     for (const channel of channels) {
-      const availabilityNum = await getAvaibilityNum(channel, 'short');
+      const availabilityNum = await getAvaibilityNum(channel, 'long');
       console.log(
         `${chalk.green(
           '[generateShortVideos]',
