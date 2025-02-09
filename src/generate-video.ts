@@ -107,6 +107,11 @@ async function generateVideos() {
       const keywords = await Keyword.find({
         isGeneratedScript: true,
         isLongGenerated: false,
+
+        $or: [
+          { topic: { $in: channel.topics } },
+          { secondTopic: { $in: channel.topics } },
+        ],
       }).sort({ priority: -1 });
 
       if (_.isEmpty(keywords)) {
@@ -224,6 +229,11 @@ async function generateShortVideos() {
       const keywords = await Keyword.find({
         isGeneratedScript: true,
         isShortGenerated: false,
+
+        $or: [
+          { topic: { $in: channel.topics } },
+          { secondTopic: { $in: channel.topics } },
+        ],
       }).sort({ priority: -1 });
 
       if (_.isEmpty(keywords)) {
