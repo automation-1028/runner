@@ -21,6 +21,10 @@ describe('isEnglishWord', () => {
         'how to be a smart parent || creative parenting ideas, life hacks by kaboom!',
       ),
     ).toBe(true);
+
+    expect(isEnglishWord(`how to escape the education's death valley`)).toBe(
+      true,
+    );
   });
 
   it('should return false for non-English words', () => {
