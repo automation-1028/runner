@@ -128,7 +128,9 @@ async function generateVideos() {
 
       await Promise.all([
         genVideo(keywords[0]),
-        //  genVideo(keywords[1])
+        genVideo(keywords[1]),
+        genVideo(keywords[2]),
+        genVideo(keywords[3]),
       ]);
       await sleep(60_000);
     }
