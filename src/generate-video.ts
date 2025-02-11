@@ -82,12 +82,36 @@ async function generateVideos(videoType: VideoType) {
 
       let taskRes;
       let isFinished = false;
+      let lastProgress = -1;
+      let lastProgressTime = Date.now();
+
       do {
         taskRes = (await retry(
           () => getTask(videoTaskRes.task_id),
           10,
         )) as ITaskResponse;
         const { progress } = taskRes;
+
+        // Check if progress is stuck
+        if (progress === lastProgress) {
+          const timeDiff = Date.now() - lastProgressTime;
+          if (timeDiff >= 30 * 60 * 1000) {
+            // 30 minutes in milliseconds
+            throw new Error(
+              `Video generation progress stuck at ${progress}% for 30 minutes`,
+            );
+          } else if (progress === 0 && timeDiff >= 5 * 60 * 1000) {
+            // 5 minutes in milliseconds
+            console.log(
+              `${chalk.green(
+                '[generateVideos]',
+              )} Video generation progress stuck at ${progress}% for 10 minutes`,
+            );
+          }
+        } else {
+          lastProgress = progress;
+          lastProgressTime = Date.now();
+        }
 
         console.log(
           `${chalk.green(
