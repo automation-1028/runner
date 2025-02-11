@@ -23,7 +23,7 @@ async function generateScripts() {
 
     await _genScriptFromKeyword(keyword);
 
-    await sleep(60_000 * 3); // 3 mins
+    await sleep(60_000);
   }
 }
 
@@ -67,7 +67,10 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
       )} Generated script with ${chalk.magenta(keyword)} keyword!`,
     );
   } catch (error) {
-    console.log(error);
+    if (error instanceof AxiosError) {
+      console.log(error.response?.data);
+    }
+
     Sentry.captureException(error);
 
     console.error(
@@ -77,9 +80,7 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
         keyword,
       )} keyword due to error: ${(error as Error).message}`,
     );
-    await sleep(60_000 * 30); // 30 mins
-  } finally {
-    await sleep(60_000); // 1 mins
+    await sleep(60_000);
   }
 }
 

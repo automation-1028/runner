@@ -135,7 +135,7 @@ async function generateVideos(videoType: VideoType) {
   while (true) {
     const channels = await Channel.find({ isActive: true });
 
-    await Promise.all([
+    await Promise.all(
       channels.map(async (channel) => {
         const availabilityNum = await getAvaibilityNum(channel, videoType);
         console.log(
@@ -158,7 +158,7 @@ async function generateVideos(videoType: VideoType) {
           return;
         }
 
-        const keywords = await Keyword.find({
+        const keyword = await Keyword.findOne({
           isGeneratedScript: true,
           [config.isGeneratedField]: false,
           $or: [
@@ -167,13 +167,13 @@ async function generateVideos(videoType: VideoType) {
           ],
         }).sort({ priority: -1 });
 
-        if (_.isEmpty(keywords)) {
+        if (!keyword) {
           return;
         }
 
-        await genVideo(keywords[0]);
+        await genVideo(keyword);
       }),
-    ]);
+    );
   }
 }
 
