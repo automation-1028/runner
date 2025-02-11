@@ -79,7 +79,7 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
     );
     await sleep(60_000 * 30); // 30 mins
   } finally {
-    await sleep(60_000 * 5); // 1 mins
+    await sleep(60_000); // 1 mins
   }
 }
 
