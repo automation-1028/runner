@@ -227,8 +227,7 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  await generateVideos('short');
-  await generateVideos('long');
+  await Promise.all([generateVideos('short'), generateVideos('long')]);
 }
 
 export { processVideos };
