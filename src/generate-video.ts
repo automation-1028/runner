@@ -102,8 +102,8 @@ async function generateVideos(videoType: VideoType) {
                 progress,
               )}% for 30 minutes`,
             );
-          } else if (progress === 0 && timeDiff >= 5 * 60 * 1000) {
-            // 5 minutes in milliseconds
+          } else if (progress === 0 && timeDiff >= 1 * 60 * 1000) {
+            // 1 minutes in milliseconds
             console.log(
               `${chalk.green(
                 '[generateVideos]',
