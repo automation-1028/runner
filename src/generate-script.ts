@@ -67,6 +67,7 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
       )} Generated script with ${chalk.magenta(keyword)} keyword!`,
     );
   } catch (error) {
+    console.log(error);
     Sentry.captureException(error);
 
     console.error(
