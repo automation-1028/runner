@@ -89,7 +89,9 @@ async function generateVideos() {
   };
 
   while (true) {
-    const channels = await Channel.find({});
+    const channels = await Channel.find({
+      isActive: true,
+    });
     for (const channel of channels) {
       const availabilityNum = await getAvaibilityNum(channel, 'long');
       console.log(
@@ -100,7 +102,7 @@ async function generateVideos() {
         )} is ${chalk.yellow(availabilityNum)}`,
       );
 
-      if (availabilityNum > 100) {
+      if (availabilityNum > channel.maxDailyLongVideosLimit) {
         console.log(
           `${chalk.green(
             '[generateShortVideos]',
@@ -223,7 +225,9 @@ async function generateShortVideos() {
   };
 
   while (true) {
-    const channels = await Channel.find({});
+    const channels = await Channel.find({
+      isActive: true,
+    });
     for (const channel of channels) {
       const availabilityNum = await getAvaibilityNum(channel, 'short');
       console.log(
@@ -234,7 +238,7 @@ async function generateShortVideos() {
         )} is ${chalk.yellow(availabilityNum)}`,
       );
 
-      if (availabilityNum > 100) {
+      if (availabilityNum > channel.maxDailyShortVideosLimit) {
         console.log(
           `${chalk.green(
             '[generateShortVideos]',
