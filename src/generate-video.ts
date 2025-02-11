@@ -67,14 +67,13 @@ async function generateVideos(videoType: VideoType) {
         )} keyword...`,
       );
 
-      const tagNum = (script.tags || '').split(',').length;
       const videoTaskRes = await generateVideo({
         ...DEFAULT_VIDEO_INFO,
         ...config.videoSettings,
         ...{
           video_subject: script.title,
           video_description: script.description,
-          video_terms: tagNum >= 5 ? script.tags : '',
+          video_terms: '',
           thumbnail: script.thumbnail,
           video_source: 'pexels',
         },
