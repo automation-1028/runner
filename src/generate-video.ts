@@ -98,14 +98,18 @@ async function generateVideos(videoType: VideoType) {
           if (timeDiff >= 30 * 60 * 1000) {
             // 30 minutes in milliseconds
             throw new Error(
-              `Video generation progress stuck at ${progress}% for 30 minutes`,
+              `Video generation progress stuck at ${chalk.yellow(
+                progress,
+              )}% for 30 minutes`,
             );
           } else if (progress === 0 && timeDiff >= 5 * 60 * 1000) {
             // 5 minutes in milliseconds
             console.log(
               `${chalk.green(
                 '[generateVideos]',
-              )} Video generation progress stuck at ${progress}% for 10 minutes`,
+              )} Video generation progress stuck at ${chalk.yellow(
+                progress,
+              )}% for 10 minutes`,
             );
           }
         } else {

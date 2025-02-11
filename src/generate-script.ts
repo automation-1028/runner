@@ -23,7 +23,7 @@ async function generateScripts() {
 
     await _genScriptFromKeyword(keyword);
 
-    await sleep(60_000);
+    await sleep(60_000 * 5); // 5 mins
   }
 }
 
@@ -67,10 +67,6 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
       )} Generated script with ${chalk.magenta(keyword)} keyword!`,
     );
   } catch (error) {
-    if (error instanceof AxiosError) {
-      console.log(error.response?.data);
-    }
-
     Sentry.captureException(error);
 
     console.error(
@@ -80,7 +76,20 @@ async function _genScriptFromKeyword(keywordDB: KeywordDocument) {
         keyword,
       )} keyword due to error: ${(error as Error).message}`,
     );
-    await sleep(60_000);
+
+    if (
+      error instanceof AxiosError &&
+      error.response?.data.error === 'Quota exceeded'
+    ) {
+      console.log(
+        `${chalk.green(
+          '[generateScripts]',
+        )} Quota exceeded, waiting for 30 minutes...`,
+      );
+      await sleep(60_000 * 30); // 30 mins
+    } else {
+      await sleep(60_000);
+    }
   }
 }
 
