@@ -35,6 +35,9 @@ export interface VideoRequestPayload {
   paragraph_number: number;
 }
 
+export interface ITaskResponse {
+  progress: number;
+}
 export const DEFAULT_VIDEO_INFO = {
   video_aspect: '16:9',
   video_concat_mode: 'random',
@@ -74,7 +77,9 @@ export const generateVideo = async (videoInfo: VideoRequestPayload) => {
   }
 };
 
-export const getTask = async (taskId: string) => {
+export const getTask = async (
+  taskId: string,
+): Promise<ITaskResponse | undefined> => {
   try {
     const response = await instance.get(`/tasks/${taskId}`);
     return response.data.data;
