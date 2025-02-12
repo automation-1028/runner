@@ -8,6 +8,7 @@ import {
   VideoRequestPayload,
   getTask,
   ITaskResponse,
+  deleteTask,
 } from './services/video-generator';
 import { retry } from './utils/retry.util';
 import { sleep } from './utils/sleep.util';
@@ -94,14 +95,16 @@ async function generateVideos(videoType: VideoType) {
         // Check if progress is stuck
         if (progress === lastProgress) {
           const timeDiff = Date.now() - lastProgressTime;
-          if (progress === 0 && timeDiff >= 1 * 60 * 1000) {
-            // 1 minutes in milliseconds
-            throw new Error(
-              `Video generation progress stuck at ${chalk.yellow(
-                progress,
-              )}% for 1 minute`,
-            );
-          } else if (timeDiff >= 30 * 60 * 1000) {
+          // if (progress === 0 && timeDiff >= 1 * 60 * 1000) {
+          //   // 1 minutes in milliseconds
+          //   throw new Error(
+          //     `Video generation progress stuck at ${chalk.yellow(
+          //       progress,
+          //     )}% for 1 minute`,
+          //   );
+          // } else
+          if (timeDiff >= 30 * 60 * 1000) {
+            await deleteTask(videoTaskRes.task_id);
             // 30 minutes in milliseconds
             throw new Error(
               `Video generation progress stuck at ${chalk.yellow(
@@ -227,7 +230,8 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  await Promise.all([generateVideos('short'), generateVideos('long')]);
+  await generateVideos('short');
+  await generateVideos('long');
 }
 
 export { processVideos };

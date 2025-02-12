@@ -89,3 +89,13 @@ export const getTask = async (
     console.error(error);
   }
 };
+
+export const deleteTask = async (taskId: string) => {
+  try {
+    await instance.delete(`/tasks/${taskId}`);
+  } catch (error) {
+    Sentry.captureException(error);
+
+    console.error(error);
+  }
+};
