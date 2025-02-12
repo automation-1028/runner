@@ -202,6 +202,8 @@ async function generateVideos(videoType: VideoType) {
         await genVideo(keyword);
       }),
     );
+
+    await sleep(60_000);
   }
 }
 
@@ -230,8 +232,7 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  await generateVideos('short');
-  await generateVideos('long');
+  await Promise.all([generateVideos('short'), generateVideos('long')]);
 }
 
 export { processVideos };
