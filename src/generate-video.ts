@@ -163,45 +163,83 @@ async function generateVideos(videoType: VideoType) {
   while (true) {
     const channels = await Channel.find({ isActive: true });
 
-    await Promise.all(
-      channels.map(async (channel) => {
-        const availabilityNum = await getAvaibilityNum(channel, videoType);
+    // await Promise.all(
+    //   channels.map(async (channel) => {
+    //     const availabilityNum = await getAvaibilityNum(channel, videoType);
+    //     console.log(
+    //       `${chalk.green(
+    //         '[generateVideos]',
+    //       )} Available ${videoType} videos for channel ${chalk.magenta(
+    //         channel.name,
+    //       )} is ${chalk.yellow(availabilityNum)}`,
+    //     );
+
+    //     if (availabilityNum > channel[config.maxDailyLimit]) {
+    //       console.log(
+    //         `${chalk.green(
+    //           '[generateVideos]',
+    //         )} Skip generating ${videoType} video for channel ${chalk.magenta(
+    //           channel.name,
+    //         )}`,
+    //       );
+
+    //       return;
+    //     }
+
+    //     const keyword = await Keyword.findOne({
+    //       isGeneratedScript: true,
+    //       [config.isGeneratedField]: false,
+    //       $or: [
+    //         { topic: { $in: channel.topics } },
+    //         { secondTopic: { $in: channel.topics } },
+    //       ],
+    //     }).sort({ priority: -1 });
+
+    //     if (!keyword) {
+    //       return;
+    //     }
+
+    //     await genVideo(keyword);
+    //   }),
+    // );
+
+    for (const channel of channels) {
+      const availabilityNum = await getAvaibilityNum(channel, videoType);
+      console.log(
+        `${chalk.green(
+          '[generateVideos]',
+        )} Available ${videoType} videos for channel ${chalk.magenta(
+          channel.name,
+        )} is ${chalk.yellow(availabilityNum)}`,
+      );
+
+      if (availabilityNum > channel[config.maxDailyLimit]) {
         console.log(
           `${chalk.green(
             '[generateVideos]',
-          )} Available ${videoType} videos for channel ${chalk.magenta(
+          )} Skip generating ${videoType} video for channel ${chalk.magenta(
             channel.name,
-          )} is ${chalk.yellow(availabilityNum)}`,
+          )}`,
         );
 
-        if (availabilityNum > channel[config.maxDailyLimit]) {
-          console.log(
-            `${chalk.green(
-              '[generateVideos]',
-            )} Skip generating ${videoType} video for channel ${chalk.magenta(
-              channel.name,
-            )}`,
-          );
+        return;
+      }
 
-          return;
-        }
+      const keyword = await Keyword.findOne({
+        isGeneratedScript: true,
+        [config.isGeneratedField]: false,
+        $or: [
+          { topic: { $in: channel.topics } },
+          { secondTopic: { $in: channel.topics } },
+        ],
+      }).sort({ priority: -1 });
 
-        const keyword = await Keyword.findOne({
-          isGeneratedScript: true,
-          [config.isGeneratedField]: false,
-          $or: [
-            { topic: { $in: channel.topics } },
-            { secondTopic: { $in: channel.topics } },
-          ],
-        }).sort({ priority: -1 });
+      if (!keyword) {
+        return;
+      }
 
-        if (!keyword) {
-          return;
-        }
-
-        await genVideo(keyword);
-      }),
-    );
+      await genVideo(keyword);
+    }
 
     await sleep(60_000);
   }
