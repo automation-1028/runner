@@ -50,6 +50,7 @@ const VIDEO_TYPE_CONFIGS: Record<VideoType, VideoTypeConfig> = {
     maxDailyLimit: 'maxDailyLongVideosLimit',
     videoSettings: {
       paragraph_number: 50,
+      video_clip_duration: 10,
     },
   },
 };
@@ -270,9 +271,9 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  // await Promise.all([generateVideos('short'), generateVideos('long')]);
+  await Promise.all([generateVideos('short'), generateVideos('long')]);
   // await generateVideos('short');
-  await generateVideos('long');
+  // await generateVideos('long');
 }
 
 export { processVideos };
