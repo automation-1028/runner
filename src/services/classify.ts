@@ -49,6 +49,7 @@ const classifyKeyword = async (
           { role: 'system', content: prompt },
           { role: 'user', content: userPrompt },
         ],
+        max_tokens: 20,
       });
 
       result = response.choices[0].message.content?.trim().toLowerCase();
