@@ -10,7 +10,7 @@ setPriorityKeywords();
 searchKeyword();
 
 generateScripts();
-processVideos();
+// processVideos();
 
 scheduleToUpload();
 uploadVideoCronJob();
