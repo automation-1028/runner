@@ -155,7 +155,7 @@ async function searchKeyword() {
                   )} under topic: ${chalk.magenta(topic)}`,
                 );
 
-                await sleep(1_000); // Rate limiting
+                await sleep(5_000); // Rate limiting
               },
               {
                 concurrency: 1,
