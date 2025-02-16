@@ -27,7 +27,7 @@ const classifyKeyword = async (
 
     let result: string | undefined;
 
-    const userPrompt = `Title: ${keyword}`;
+    const userPrompt = `What topic category does the video title "${keyword}" belong to?`;
 
     if (provider === 'ollama') {
       const response = await ollama.chat.completions.create({
