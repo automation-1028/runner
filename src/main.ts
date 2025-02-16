@@ -6,11 +6,11 @@ import { searchKeyword, setPriorityKeywords } from './search-topic';
 import { scheduleToUpload, uploadVideoCronJob } from './upload-video';
 import { processVideos } from './generate-video';
 
-// setPriorityKeywords();
+setPriorityKeywords();
 // searchKeyword();
 
-// generateScripts();
+generateScripts();
 processVideos();
 
-// scheduleToUpload();
-// uploadVideoCronJob();
+scheduleToUpload();
+uploadVideoCronJob();
