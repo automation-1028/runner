@@ -7,7 +7,7 @@ import { scheduleToUpload, uploadVideoCronJob } from './upload-video';
 import { processVideos } from './generate-video';
 
 setPriorityKeywords();
-// searchKeyword();
+searchKeyword();
 
 generateScripts();
 processVideos();
