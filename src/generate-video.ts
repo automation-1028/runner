@@ -239,11 +239,6 @@ async function getAvaibilityNum(
 async function processVideos() {
   generateVideos('short');
   generateVideos('long');
-
-  await sleep(60_000 * 3);
-  generateVideos('long');
-  // await generateVideos('short');
-  // await generateVideos('long');
 }
 
 export { processVideos };
