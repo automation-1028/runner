@@ -203,10 +203,10 @@ async function generateVideos(videoType: VideoType) {
 
       await Bluebird.Promise.map(
         keywords,
-        async (keyword, i) => {
+        async (keyword) => {
           await genVideo(keyword);
         },
-        { concurrency: 3 },
+        { concurrency: 1 },
       );
     }
   };
@@ -215,7 +215,7 @@ async function generateVideos(videoType: VideoType) {
   for (const channel of channels) {
     genVideoByChannel(channel);
 
-    await sleep(60_000 * 10);
+    // await sleep(60_000 * 10);
   }
 }
 
@@ -245,7 +245,7 @@ async function getAvaibilityNum(
 
 async function processVideos() {
   generateVideos('long');
-  await sleep(60_000 * 10);
+  await sleep(60_000);
   generateVideos('short');
 }
 
