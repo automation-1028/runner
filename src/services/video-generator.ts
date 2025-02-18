@@ -48,7 +48,7 @@ export const DEFAULT_VIDEO_INFO = {
   video_materials: null,
   video_language: 'en-US',
   // voice_name: 'en-US-AndrewMultilingualNeural-Male',
-  voice_name: 'tts_models/multilingual/multi-dataset/xtts_v2',
+  voice_name: 'tts_models/en/vctk/vits',
   voice_volume: 1.0,
   voice_rate: 1.0,
   bgm_type: '',
