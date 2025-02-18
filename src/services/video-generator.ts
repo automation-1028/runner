@@ -63,7 +63,7 @@ export const DEFAULT_VIDEO_INFO = {
   font_size: 60,
   stroke_color: '#000000',
   stroke_width: 1.5,
-  n_threads: 8,
+  n_threads: 20,
   paragraph_number: 1,
 };
 
