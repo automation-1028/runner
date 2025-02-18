@@ -69,7 +69,8 @@ async function searchKeyword() {
     path.join(__dirname, '../my-topic.txt'),
   );
 
-  while (true) {
+  // while (true) {
+  for (let i = 0; i < 1000; i++) {
     let topics = topicManager.getTopics();
     topics = _.uniq(topics);
     topics = _.sampleSize(topics, topics.length);
