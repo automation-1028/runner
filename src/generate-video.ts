@@ -206,7 +206,7 @@ async function generateVideos(videoType: VideoType) {
         async (keyword) => {
           await genVideo(keyword);
         },
-        { concurrency: 1 },
+        { concurrency: 2 },
       );
     }
   };
@@ -245,7 +245,7 @@ async function getAvaibilityNum(
 
 async function processVideos() {
   generateVideos('long');
-  await sleep(60_000);
+  await sleep(60_000 * 10);
   generateVideos('short');
 }
 
