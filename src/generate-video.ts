@@ -17,6 +17,7 @@ import { Channel, ChannelDocument } from './models/channel';
 import { Upload } from './models/upload';
 
 import Sentry from './configs/sentry';
+import Bluebird from 'bluebird';
 
 type VideoType = 'short' | 'long';
 
@@ -58,7 +59,9 @@ const VIDEO_TYPE_CONFIGS: Record<VideoType, VideoTypeConfig> = {
 async function generateVideos(videoType: VideoType) {
   const config = VIDEO_TYPE_CONFIGS[videoType];
 
-  const genVideo = async (keyword: KeywordDocument) => {
+  const genVideo = async (keyword: KeywordDocument, i: number) => {
+    await sleep(i * 60_000);
+
     const script = keyword.script as IScript;
     try {
       console.log(
@@ -185,7 +188,7 @@ async function generateVideos(videoType: VideoType) {
         continue;
       }
 
-      const keyword = await Keyword.findOne({
+      const keywords = await Keyword.find({
         isGeneratedScript: true,
         [config.isGeneratedField]: false,
         $or: [
@@ -194,13 +197,19 @@ async function generateVideos(videoType: VideoType) {
         ],
       }).sort({ priority: -1 });
 
-      if (!keyword) {
+      if (_.isEmpty(keywords)) {
         await sleep(60_000);
 
         continue;
       }
 
-      await genVideo(keyword);
+      await Bluebird.Promise.map(
+        keywords,
+        async (keyword, i) => {
+          await genVideo(keyword, i);
+        },
+        { concurrency: 5 },
+      );
     }
   };
   const channels = await Channel.find({ isActive: true });
@@ -208,7 +217,7 @@ async function generateVideos(videoType: VideoType) {
   for (const channel of channels) {
     genVideoByChannel(channel);
 
-    await sleep(60_000);
+    await sleep(60_000 * 10);
   }
 }
 
