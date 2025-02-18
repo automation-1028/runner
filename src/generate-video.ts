@@ -161,86 +161,52 @@ async function generateVideos(videoType: VideoType) {
     }
   };
 
-  while (true) {
-    const channels = await Channel.find({ isActive: true });
+  const genVideoByChannel = async (channel: ChannelDocument) => {
+    while (true) {
+      const availabilityNum = await getAvaibilityNum(channel, videoType);
+      console.log(
+        `${chalk.green(
+          '[generateVideos]',
+        )} Available ${videoType} videos for channel ${chalk.magenta(
+          channel.name,
+        )} is ${chalk.yellow(availabilityNum)}`,
+      );
 
-    await Promise.all(
-      channels.map(async (channel) => {
-        const availabilityNum = await getAvaibilityNum(channel, videoType);
+      if (availabilityNum > channel[config.maxDailyLimit]) {
         console.log(
           `${chalk.green(
             '[generateVideos]',
-          )} Available ${videoType} videos for channel ${chalk.magenta(
+          )} Skip generating ${videoType} video for channel ${chalk.magenta(
             channel.name,
-          )} is ${chalk.yellow(availabilityNum)}`,
+          )}`,
         );
 
-        if (availabilityNum > channel[config.maxDailyLimit]) {
-          console.log(
-            `${chalk.green(
-              '[generateVideos]',
-            )} Skip generating ${videoType} video for channel ${chalk.magenta(
-              channel.name,
-            )}`,
-          );
+        await sleep(60_000);
+        continue;
+      }
 
-          return;
-        }
+      const keyword = await Keyword.findOne({
+        isGeneratedScript: true,
+        [config.isGeneratedField]: false,
+        $or: [
+          { topic: { $in: channel.topics } },
+          { secondTopic: { $in: channel.topics } },
+        ],
+      }).sort({ priority: -1 });
 
-        const keyword = await Keyword.findOne({
-          isGeneratedScript: true,
-          [config.isGeneratedField]: false,
-          $or: [
-            { topic: { $in: channel.topics } },
-            { secondTopic: { $in: channel.topics } },
-          ],
-        }).sort({ priority: -1 });
+      if (!keyword) {
+        await sleep(60_000);
 
-        if (!keyword) {
-          return;
-        }
+        continue;
+      }
 
-        await genVideo(keyword);
-      }),
-    );
+      await genVideo(keyword);
+    }
+  };
+  const channels = await Channel.find({ isActive: true });
 
-    // for (const channel of channels) {
-    //   const availabilityNum = await getAvaibilityNum(channel, videoType);
-    //   console.log(
-    //     `${chalk.green(
-    //       '[generateVideos]',
-    //     )} Available ${videoType} videos for channel ${chalk.magenta(
-    //       channel.name,
-    //     )} is ${chalk.yellow(availabilityNum)}`,
-    //   );
-
-    //   if (availabilityNum > channel[config.maxDailyLimit]) {
-    //     console.log(
-    //       `${chalk.green(
-    //         '[generateVideos]',
-    //       )} Skip generating ${videoType} video for channel ${chalk.magenta(
-    //         channel.name,
-    //       )}`,
-    //     );
-
-    //     return;
-    //   }
-
-    //   const keyword = await Keyword.findOne({
-    //     isGeneratedScript: true,
-    //     [config.isGeneratedField]: false,
-    //     $or: [
-    //       { topic: { $in: channel.topics } },
-    //       { secondTopic: { $in: channel.topics } },
-    //     ],
-    //   }).sort({ priority: -1 });
-
-    //   if (!keyword) {
-    //     return;
-    //   }
-
-    //   await genVideo(keyword);
-    // }
+  for (const channel of channels) {
+    genVideoByChannel(channel);
 
     await sleep(60_000);
   }
