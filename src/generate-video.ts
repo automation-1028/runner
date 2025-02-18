@@ -59,9 +59,7 @@ const VIDEO_TYPE_CONFIGS: Record<VideoType, VideoTypeConfig> = {
 async function generateVideos(videoType: VideoType) {
   const config = VIDEO_TYPE_CONFIGS[videoType];
 
-  const genVideo = async (keyword: KeywordDocument, i: number) => {
-    await sleep(i * 5 * 60_000);
-
+  const genVideo = async (keyword: KeywordDocument) => {
     const script = keyword.script as IScript;
     try {
       console.log(
@@ -206,9 +204,9 @@ async function generateVideos(videoType: VideoType) {
       await Bluebird.Promise.map(
         keywords,
         async (keyword, i) => {
-          await genVideo(keyword, i);
+          await genVideo(keyword);
         },
-        { concurrency: 5 },
+        { concurrency: 3 },
       );
     }
   };
@@ -246,8 +244,9 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  generateVideos('short');
   generateVideos('long');
+  await sleep(60_000 * 10);
+  generateVideos('short');
 }
 
 export { processVideos };
