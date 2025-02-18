@@ -105,9 +105,9 @@ async function generateVideos(videoType: VideoType) {
           //     )}% for 1 minute`,
           //   );
           // } else
-          if (timeDiff >= 30 * 60 * 1000) {
+          if (timeDiff >= 80 * 60 * 1000) {
             await deleteTask(videoTaskRes.task_id);
-            // 30 minutes in milliseconds
+            // 80 minutes in milliseconds
             throw new Error(
               `Video generation progress stuck at ${chalk.yellow(
                 progress,
