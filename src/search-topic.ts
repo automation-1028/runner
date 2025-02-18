@@ -65,6 +65,7 @@ class TopicManager {
 }
 
 async function searchKeyword() {
+  await sleep(60_000 * 10);
   const topicManager = new TopicManager(
     path.join(__dirname, '../my-topic.txt'),
   );
