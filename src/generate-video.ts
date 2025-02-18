@@ -60,7 +60,7 @@ async function generateVideos(videoType: VideoType) {
   const config = VIDEO_TYPE_CONFIGS[videoType];
 
   const genVideo = async (keyword: KeywordDocument, i: number) => {
-    await sleep(i * 60_000);
+    await sleep(i * 5 * 60_000);
 
     const script = keyword.script as IScript;
     try {
