@@ -70,8 +70,8 @@ async function searchKeyword() {
     path.join(__dirname, '../my-topic.txt'),
   );
 
-  // while (true) {
-  for (let i = 0; i < 1000; i++) {
+  while (true) {
+    // for (let i = 0; i < 1000; i++) {
     let topics = topicManager.getTopics();
     topics = _.uniq(topics);
     topics = _.sampleSize(topics, topics.length);
@@ -156,6 +156,8 @@ async function searchKeyword() {
                     questionKeyword,
                   )} under topic: ${chalk.magenta(topic)}`,
                 );
+
+                await sleep(1_000); // Rate limiting
               },
               {
                 concurrency: 1,
