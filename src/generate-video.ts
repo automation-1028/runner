@@ -237,7 +237,11 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  await Promise.all([generateVideos('short'), generateVideos('long')]);
+  generateVideos('short');
+  generateVideos('long');
+
+  await sleep(60_000 * 3);
+  generateVideos('long');
   // await generateVideos('short');
   // await generateVideos('long');
 }
