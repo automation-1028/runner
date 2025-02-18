@@ -159,6 +159,8 @@ async function generateVideos(videoType: VideoType) {
           script.keyword,
         )} keyword due to error: ${(error as Error).message}`,
       );
+
+      await sleep(60_000);
     }
   };
 
