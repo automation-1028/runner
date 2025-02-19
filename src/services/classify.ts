@@ -20,7 +20,7 @@ const VALID_TOPICS = [
 
 const classifyKeyword = async (
   keyword: string,
-  provider: 'openai' | 'ollama' | 'deepseek' = 'deepseek',
+  provider: 'openai' | 'ollama' | 'deepseek' = 'ollama',
 ): Promise<string> => {
   try {
     const prompt = `You are analyzing YouTube video titles. For the given video title, classify it into a single, specific topic category that best represents its main theme and content. IMPORTANT: Your response must contain ONLY the topic name in lowercase, with no additional text, punctuation, or explanation. The topic should be a single word or short phrase that clearly categorizes the content. Do not include any other information in your response - just the lowercase topic name.`;
