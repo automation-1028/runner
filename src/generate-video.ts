@@ -165,60 +165,57 @@ async function generateVideos(videoType: VideoType) {
   };
 
   const genVideoByChannel = async (channel: ChannelDocument) => {
-    while (true) {
-      const availabilityNum = await getAvaibilityNum(channel, videoType);
+    const availabilityNum = await getAvaibilityNum(channel, videoType);
+    console.log(
+      `${chalk.green(
+        '[generateVideos]',
+      )} Available ${videoType} videos for channel ${chalk.magenta(
+        channel.name,
+      )} is ${chalk.yellow(availabilityNum)}`,
+    );
+
+    if (availabilityNum > channel[config.maxDailyLimit]) {
       console.log(
         `${chalk.green(
           '[generateVideos]',
-        )} Available ${videoType} videos for channel ${chalk.magenta(
+        )} Skip generating ${videoType} video for channel ${chalk.magenta(
           channel.name,
-        )} is ${chalk.yellow(availabilityNum)}`,
+        )}`,
       );
 
-      if (availabilityNum > channel[config.maxDailyLimit]) {
-        console.log(
-          `${chalk.green(
-            '[generateVideos]',
-          )} Skip generating ${videoType} video for channel ${chalk.magenta(
-            channel.name,
-          )}`,
-        );
-
-        await sleep(60_000);
-        continue;
-      }
-
-      const keywords = await Keyword.find({
-        isGeneratedScript: true,
-        [config.isGeneratedField]: false,
-        $or: [
-          { topic: { $in: channel.topics } },
-          { secondTopic: { $in: channel.topics } },
-        ],
-      }).sort({ priority: -1 });
-
-      if (_.isEmpty(keywords)) {
-        await sleep(60_000);
-
-        continue;
-      }
-
-      await Bluebird.Promise.map(
-        keywords,
-        async (keyword) => {
-          await genVideo(keyword);
-        },
-        { concurrency: 1 },
-      );
+      return;
     }
+
+    const keywords = await Keyword.find({
+      isGeneratedScript: true,
+      [config.isGeneratedField]: false,
+      $or: [
+        { topic: { $in: channel.topics } },
+        { secondTopic: { $in: channel.topics } },
+      ],
+    }).sort({ priority: -1 });
+
+    if (_.isEmpty(keywords)) {
+      return;
+    }
+
+    await Bluebird.Promise.map(
+      keywords,
+      async (keyword) => {
+        await genVideo(keyword);
+      },
+      { concurrency: 1 },
+    );
   };
   const channels = await Channel.find({ isActive: true });
 
-  for (const channel of channels) {
-    genVideoByChannel(channel);
-
-    await sleep(60_000);
-  }
+  await Bluebird.Promise.map(
+    channels,
+    async (channel) => {
+      await genVideoByChannel(channel);
+    },
+    { concurrency: 2 },
+  );
 }
 
 async function getAvaibilityNum(
@@ -246,9 +243,10 @@ async function getAvaibilityNum(
 }
 
 async function processVideos() {
-  generateVideos('long');
-  await sleep(60_000 * 2);
-  generateVideos('short');
+  while (true) {
+    await generateVideos('short');
+    await generateVideos('long');
+  }
 }
 
 export { processVideos };
