@@ -214,7 +214,7 @@ async function generateVideos(videoType: VideoType) {
     async (channel) => {
       await genVideoByChannel(channel);
     },
-    { concurrency: 2 },
+    { concurrency: 1 },
   );
 }
 
@@ -244,8 +244,9 @@ async function getAvaibilityNum(
 
 async function processVideos() {
   while (true) {
-    await Promise.all([generateVideos('short'), generateVideos('long')]);
-    // await generateVideos('long');
+    // await Promise.all([generateVideos('short'), generateVideos('long')]);
+    await generateVideos('long');
+    await generateVideos('short');
   }
 }
 
