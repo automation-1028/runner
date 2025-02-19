@@ -244,8 +244,8 @@ async function getAvaibilityNum(
 
 async function processVideos() {
   while (true) {
-    await generateVideos('short');
-    await generateVideos('long');
+    await Promise.all([generateVideos('short'), generateVideos('long')]);
+    // await generateVideos('long');
   }
 }
 
