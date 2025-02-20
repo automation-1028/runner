@@ -11,199 +11,180 @@ import { sleep } from './utils/sleep.util';
 import { isEnglishWord } from './utils/english.util';
 import { getWordSimilarity } from './utils/similarity.util';
 import Sentry from './configs/sentry';
+import { Channel } from './models/channel';
+import { TopicSearch } from './models/topic-search';
 
-const priotizeTopics = [
-  'travel',
-  'food',
-  'exploration',
-  'culture',
-  'motivation',
-  'mindfulness',
-  'psychology',
-  'leadership',
-  // 'selfhelp',
-  'life experiences',
-  'personal growth',
-];
+async function createReletedTopics(priotizeTopics: string[]) {
+  for (const topic of priotizeTopics) {
+    const isExist = await TopicSearch.exists({ topic });
+    if (isExist) continue;
+    const relatedTopics = await getRelatedKeywords(topic);
 
-class TopicManager {
-  private topicPath: string;
-
-  constructor(topicPath: string) {
-    this.topicPath = topicPath;
-  }
-
-  getTopics(): string[] {
-    try {
-      return fs
-        .readFileSync(this.topicPath, 'utf-8')
-        .split('\n')
-        .map((k) => k.trim())
-        .filter((k) => !!k);
-    } catch (error) {
-      Sentry.captureException(error);
-
-      console.error(`Failed to read topics: ${(error as Error).message}`);
-      return [];
-    }
-  }
-
-  updateTopics(topics: string[]): void {
-    try {
-      fs.writeFileSync(this.topicPath, topics.join('\n'));
-    } catch (error) {
-      Sentry.captureException(error);
-
-      console.error(`Failed to write topics: ${(error as Error).message}`);
-    }
-  }
-
-  removeTopic(topic: string): void {
-    const topics = this.getTopics().filter((t) => t !== topic);
-    this.updateTopics(topics);
+    await Promise.map(
+      relatedTopics,
+      async (relatedTopic) => {
+        await TopicSearch.findOneAndUpdate(
+          { topic, relatedTopic },
+          {
+            topic,
+            relatedTopic,
+            isHandled: false,
+          },
+          { upsert: true },
+        );
+      },
+      {
+        concurrency: 1,
+      },
+    );
   }
 }
-
 async function searchKeyword() {
-  const topicManager = new TopicManager(
-    path.join(__dirname, '../my-topic.txt'),
-  );
+  const channels = await Channel.find({ isRunningSearchKeyword: true });
+  const priotizeTopics = channels.flatMap((channel) => channel.topics);
 
-  while (true) {
-    // for (let i = 0; i < 1000; i++) {
-    let topics = topicManager.getTopics();
-    topics = _.uniq(topics);
-    topics = _.sampleSize(topics, topics.length);
+  await createReletedTopics(priotizeTopics);
+  await Promise.map(
+    channels,
+    async (channel) => {
+      const { topics } = channel;
 
-    if (topics.length === 0) {
-      console.log(
-        `${chalk.green(`[searchKeyword]`)} No topics to process. Waiting...`,
-      );
-
-      return;
-    }
-
-    const currentTopic = topics.pop();
-    if (!currentTopic) continue;
-
-    try {
-      console.log(
-        `${chalk.green(`[searchKeyword]`)} Processing topic: ${chalk.magenta(
-          currentTopic,
-        )}`,
-      );
-
-      let relatedKeywords = await getRelatedKeywords(currentTopic);
-      relatedKeywords = relatedKeywords.filter((k) => isEnglishWord(k));
-
-      // Update topics list
-      topics = topics.filter((t) => t !== currentTopic);
-      if (currentTopic.length < 10_000) {
-        topics.push(...relatedKeywords);
-      }
-      topicManager.updateTopics(topics);
-
-      // Process keywords in batches
       await Promise.map(
-        relatedKeywords,
-        async (keyword) => {
+        topics,
+        async (topic) => {
           try {
-            const questions = await getQuestions(keyword);
+            console.log(
+              `${chalk.green(
+                `[searchKeyword]`,
+              )} Processing topic: ${chalk.magenta(topic)}`,
+            );
+
+            const relatedTopics = await TopicSearch.find({
+              topic,
+              isHandled: false,
+            });
+
+            // Process keywords in batches
             await Promise.map(
-              questions,
-              async (question) => {
-                const {
-                  keyword: questionKeyword,
-                  competition,
-                  volume,
-                  overall,
-                  estimated_monthly_search,
-                } = question;
-
-                // Skip non-English keywords
-                if (!isEnglishWord(questionKeyword)) {
-                  console.log(
-                    `${chalk.yellow(
-                      `[searchKeyword]`,
-                    )} Skipping non-English keyword: ${chalk.magenta(
-                      questionKeyword,
-                    )}`,
+              relatedTopics,
+              async (relatedTopic) => {
+                try {
+                  const questions = await getQuestions(
+                    relatedTopic.relatedTopic,
                   );
-                  return;
+
+                  await Promise.map(
+                    questions,
+                    async (question) => {
+                      const {
+                        keyword: questionKeyword,
+                        competition,
+                        volume,
+                        overall,
+                        estimated_monthly_search,
+                      } = question;
+
+                      // Skip non-English keywords
+                      if (!isEnglishWord(questionKeyword)) {
+                        console.log(
+                          `${chalk.yellow(
+                            `[searchKeyword]`,
+                          )} Skipping non-English keyword: ${chalk.magenta(
+                            questionKeyword,
+                          )}`,
+                        );
+                        return;
+                      }
+
+                      const keywordTopic = await classifyKeyword(
+                        questionKeyword,
+                      );
+                      const priority = priotizeTopics.includes(keywordTopic)
+                        ? 1
+                        : 0;
+
+                      await Keyword.findOneAndUpdate(
+                        { keyword: questionKeyword },
+                        {
+                          competition,
+                          volume,
+                          overall,
+                          estimatedMonthlySearch: estimated_monthly_search,
+                          topic: keywordTopic,
+                          priority,
+                        },
+                        { upsert: true },
+                      );
+
+                      console.log(
+                        `${chalk.green(
+                          `[searchKeyword]`,
+                        )} Processed keyword: ${chalk.magenta(
+                          questionKeyword,
+                        )} under topic: ${chalk.magenta(keywordTopic)}`,
+                      );
+
+                      await sleep(2_000); // Rate limiting
+                    },
+                    {
+                      concurrency: 1,
+                    },
+                  );
+
+                  await TopicSearch.updateOne(
+                    { _id: relatedTopic._id },
+                    { isHandled: true },
+                  );
+                } catch (error) {
+                  Sentry.captureException(error);
+
+                  console.error(
+                    `${chalk.red(
+                      `[searchKeyword]`,
+                    )} Failed to process related topic ${
+                      relatedTopic.relatedTopic
+                    }: ${(error as Error).message}`,
+                  );
+                  await sleep(60_000);
                 }
-
-                const topic = await classifyKeyword(questionKeyword);
-                const priority = priotizeTopics.includes(topic) ? 1 : 0;
-
-                await Keyword.findOneAndUpdate(
-                  { keyword: questionKeyword },
-                  {
-                    competition,
-                    volume,
-                    overall,
-                    estimatedMonthlySearch: estimated_monthly_search,
-                    topic,
-                    priority,
-                  },
-                  { upsert: true },
-                );
-
-                console.log(
-                  `${chalk.green(
-                    `[searchKeyword]`,
-                  )} Processed keyword: ${chalk.magenta(
-                    questionKeyword,
-                  )} under topic: ${chalk.magenta(topic)}`,
-                );
-
-                await sleep(1_000); // Rate limiting
               },
               {
                 concurrency: 1,
               },
             );
-
-            topicManager.removeTopic(keyword);
           } catch (error) {
             Sentry.captureException(error);
 
             console.error(
               `${chalk.red(
                 `[searchKeyword]`,
-              )} Failed to process keyword ${keyword}: ${
-                (error as Error).message
-              }`,
+              )} Failed to process topic ${topic}: ${(error as Error).message}`,
             );
-            await sleep(60_000);
+            await sleep(60_000); // Wait 30 minutes before retrying
           }
         },
         {
           concurrency: 1,
         },
       );
-    } catch (error) {
-      Sentry.captureException(error);
-
-      console.error(
-        `${chalk.red(
-          `[searchKeyword]`,
-        )} Failed to process topic ${currentTopic}: ${
-          (error as Error).message
-        }`,
-      );
-      await sleep(60_000); // Wait 30 minutes before retrying
-    }
-  }
+    },
+    {
+      concurrency: 2,
+    },
+  );
 }
 
 async function setPriorityKeywords() {
+  const channels = await Channel.find({ isRunningSearchKeyword: true });
+  const topics = channels.flatMap((channel) => channel.topics);
+
   while (true) {
     const keywords: KeywordDocument[] = await Keyword.find({})
       .sort({ updatedAt: 1 })
       .limit(1000);
 
     for (const keyword of keywords) {
-      const [priority, topic] = calculatePriority(keyword.topic);
+      const [priority, topic] = calculatePriority(keyword.topic, topics);
       // console.log(
       //   `${chalk.green(
       //     `[setPriorityKeywords]`,
@@ -227,8 +208,11 @@ async function setPriorityKeywords() {
   }
 }
 
-function calculatePriority(comparedTopic: string): [number, string] {
-  const priorityTopics = priotizeTopics.map((topic) => [
+function calculatePriority(
+  comparedTopic: string,
+  topics: string[],
+): [number, string] {
+  const priorityTopics = topics.map((topic) => [
     getWordSimilarity(comparedTopic, topic),
     topic,
   ]);

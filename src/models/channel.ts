@@ -7,6 +7,7 @@ export interface IChannel {
   maxDailyLongVideosLimit: number;
   chromeProfileId: string;
   isActive: boolean;
+  isRunningSearchKeyword: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +22,7 @@ const ChannelSchema = new Schema<ChannelDocument>(
     maxDailyLongVideosLimit: { type: Number, required: true },
     chromeProfileId: { type: String, required: true },
     isActive: { type: Boolean, default: true },
+    isRunningSearchKeyword: { type: Boolean, default: true },
   },
   { timestamps: true },
 );
