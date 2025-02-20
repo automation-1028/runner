@@ -176,7 +176,7 @@ async function uploadVideoCronJob() {
   while (true) {
     try {
       const channels = await Channel.find({
-        isActive: true,
+        isUploadingVideo: true,
       }).exec();
 
       await Promise.all(
