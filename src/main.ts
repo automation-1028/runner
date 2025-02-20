@@ -6,8 +6,8 @@ import { searchKeyword, setPriorityKeywords } from './search-topic';
 import { scheduleToUpload, uploadVideoCronJob } from './upload-video';
 import { processVideos } from './generate-video';
 
-setPriorityKeywords();
-searchKeyword();
+// setPriorityKeywords();
+// searchKeyword();
 
 generateScripts();
 processVideos();

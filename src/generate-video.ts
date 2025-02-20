@@ -214,7 +214,7 @@ async function generateVideos(videoType: VideoType) {
     async (channel) => {
       await genVideoByChannel(channel);
     },
-    { concurrency: 2 },
+    { concurrency: 1 },
   );
 }
 
