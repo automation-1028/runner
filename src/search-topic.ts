@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import chalk from 'chalk';
 import { Promise } from 'bluebird';
 import _ from 'lodash';
@@ -90,6 +88,20 @@ async function searchKeyword() {
                           `${chalk.yellow(
                             `[searchKeyword]`,
                           )} Skipping non-English keyword: ${chalk.magenta(
+                            questionKeyword,
+                          )}`,
+                        );
+                        return;
+                      }
+
+                      const isExist = await Keyword.exists({
+                        keyword: questionKeyword,
+                      });
+                      if (isExist) {
+                        console.log(
+                          `${chalk.yellow(
+                            `[searchKeyword]`,
+                          )} Skipping existing keyword: ${chalk.magenta(
                             questionKeyword,
                           )}`,
                         );
