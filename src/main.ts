@@ -12,5 +12,5 @@ import { processVideos } from './generate-video';
 generateScripts();
 processVideos();
 
-scheduleToUpload();
-uploadVideoCronJob();
+// scheduleToUpload();
+// uploadVideoCronJob();
