@@ -204,7 +204,7 @@ async function generateVideos(videoType: VideoType) {
       async (keyword) => {
         await genVideo(keyword);
       },
-      { concurrency: 16 },
+      { concurrency: 8 },
     );
   };
   const channels = await Channel.find({ isActive: true });

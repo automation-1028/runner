@@ -12,5 +12,5 @@ searchKeyword();
 generateScripts();
 processVideos();
 
-// scheduleToUpload();
-// uploadVideoCronJob();
+scheduleToUpload();
+uploadVideoCronJob();
