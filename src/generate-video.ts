@@ -204,7 +204,7 @@ async function generateVideos(videoType: VideoType) {
       async (keyword) => {
         await genVideo(keyword);
       },
-      { concurrency: 1 },
+      { concurrency: 2 },
     );
   };
   const channels = await Channel.find({ isActive: true });
@@ -214,7 +214,7 @@ async function generateVideos(videoType: VideoType) {
     async (channel) => {
       await genVideoByChannel(channel);
     },
-    { concurrency: 1 },
+    { concurrency: 2 },
   );
 }
 
@@ -244,10 +244,10 @@ async function getAvaibilityNum(
 
 async function processVideos() {
   while (true) {
-    // await Promise.all([generateVideos('short'), generateVideos('long')]);
+    await Promise.all([generateVideos('short'), generateVideos('long')]);
 
-    await generateVideos('short');
-    await generateVideos('long');
+    // await generateVideos('short');
+    // await generateVideos('long');
   }
 }
 
