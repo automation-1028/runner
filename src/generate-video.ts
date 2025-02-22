@@ -193,7 +193,9 @@ async function generateVideos(videoType: VideoType) {
         { topic: { $in: channel.topics } },
         { secondTopic: { $in: channel.topics } },
       ],
-    }).sort({ priority: -1 });
+    })
+      .sort({ priority: -1 })
+      .limit(channel[config.maxDailyLimit] - availabilityNum);
 
     if (_.isEmpty(keywords)) {
       return;
