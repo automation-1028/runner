@@ -250,6 +250,8 @@ async function processVideos() {
 
     // await generateVideos('short');
     // await generateVideos('long');
+
+    await sleep(60_000);
   }
 }
 
